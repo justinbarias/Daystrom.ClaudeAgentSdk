@@ -1,5 +1,4 @@
 <Project>
-
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
@@ -13,5 +12,4 @@
       first entries when the core library and its test project come online.
     -->
   </ItemGroup>
-
 </Project>

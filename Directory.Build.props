@@ -1,5 +1,4 @@
 <Project>
-
   <Import Project="$(MSBuildThisFileDirectory)eng/Versions.props" />
 
   <PropertyGroup>
@@ -13,7 +12,6 @@
 
     <!-- Reproducibility -->
     <Deterministic>true</Deterministic>
-    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
 
     <!-- Source Link & symbols (consumed during pack in Phase 15) -->
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -34,4 +32,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
 </Project>

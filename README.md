@@ -23,6 +23,18 @@ for the implementation plan.
 | `Anthropic.ClaudeAgentSdk.Testing` | `FakeTransport`, `RecordingTransport` |
 | `runtime.{rid}.Anthropic.ClaudeAgentSdk.Native` | Bundled `claude` binary, per RID |
 
+## Contributing
+
+Code is formatted with [CSharpier](https://csharpier.com/), pinned as a
+local tool in `dotnet-tools.json`. Before committing:
+
+```sh
+dotnet tool restore
+dotnet csharpier format .
+```
+
+CI fails any PR that isn't CSharpier-clean (`dotnet csharpier check .`).
+
 ## License
 
 [MIT](LICENSE)
