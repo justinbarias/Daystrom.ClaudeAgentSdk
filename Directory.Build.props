@@ -1,0 +1,37 @@
+<Project>
+
+  <Import Project="$(MSBuildThisFileDirectory)eng/Versions.props" />
+
+  <PropertyGroup>
+    <!-- Language -->
+    <LangVersion>14</LangVersion>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+    <!-- Reproducibility -->
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+
+    <!-- Source Link & symbols (consumed during pack in Phase 15) -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+    <!-- Default to non-AOT; the core library opts in via its own csproj.
+         Phase 15.4 adds the CI gate that enforces zero AOT/trim warnings
+         on IsAotCompatible projects. -->
+    <IsAotCompatible>false</IsAotCompatible>
+
+    <!-- Repo-wide identity (overridden per-package in Phase 3+ csprojs) -->
+    <Authors>Justin Barias</Authors>
+    <Company>Justin Barias</Company>
+    <Copyright>Copyright (c) 2026 Justin Barias</Copyright>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,17 @@
+<Project>
+
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--
+      PackageVersion entries are added per phase as packages are first
+      consumed. See docs/superpowers/plans/ for the schedule. Phase 1
+      intentionally ships an empty list; Phase 3 (wire types) adds the
+      first entries when the core library and its test project come online.
+    -->
+  </ItemGroup>
+
+</Project>
