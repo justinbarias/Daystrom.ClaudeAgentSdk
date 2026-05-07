@@ -1,4 +1,13 @@
 <Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Anthropic.ClaudeAgentSdk/Anthropic.ClaudeAgentSdk.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Anthropic.ClaudeAgentSdk.Tests/Anthropic.ClaudeAgentSdk.Tests.csproj" />
+  </Folder>
+  <Folder Name="/eng/">
+    <Project Path="eng/aot-smoke/AotSmoke.csproj" />
+  </Folder>
   <Folder Name="/runtimes/">
     <Project Path="src/runtimes/runtime.linux-arm64.Anthropic.ClaudeAgentSdk.Native/runtime.linux-arm64.Anthropic.ClaudeAgentSdk.Native.csproj" />
     <Project Path="src/runtimes/runtime.linux-x64.Anthropic.ClaudeAgentSdk.Native/runtime.linux-x64.Anthropic.ClaudeAgentSdk.Native.csproj" />

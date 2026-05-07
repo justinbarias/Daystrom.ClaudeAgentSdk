@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Anthropic.ClaudeAgentSdk.Tests</RootNamespace>
+    <AssemblyName>Anthropic.ClaudeAgentSdk.Tests</AssemblyName>
+
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+
+    <!-- Test projects don't need to be AOT-clean — they reference Reflection-
+         heavy testing infrastructure (xunit, Verify). The core library being
+         tested is AOT-clean; that's what matters. -->
+    <IsAotCompatible>false</IsAotCompatible>
+
+    <!-- Doc-comment warnings on test code are noise. -->
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="Verify.Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Anthropic.ClaudeAgentSdk\Anthropic.ClaudeAgentSdk.csproj" />
+  </ItemGroup>
+
+  <!--
+    Fixture files captured from the bundled CLI (Phase 3.0e) live under
+    Fixtures/ and are embedded so tests load them deterministically across
+    operating systems and from `dotnet test` invocations in any working
+    directory.
+  -->
+  <ItemGroup>
+    <EmbeddedResource Include="Fixtures\**\*.json" />
+    <EmbeddedResource Include="Fixtures\**\*.ndjson" />
+  </ItemGroup>
+</Project>
