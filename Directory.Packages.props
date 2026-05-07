@@ -5,11 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!--
-      PackageVersion entries are added per phase as packages are first
-      consumed. See docs/superpowers/plans/ for the schedule. Phase 1
-      intentionally ships an empty list; Phase 3 (wire types) adds the
-      first entries when the core library and its test project come online.
-    -->
+    <!-- Test infrastructure (Phase 3 — first consumers). -->
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageVersion Include="xunit" Version="2.9.2" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
+    <PackageVersion Include="Verify.Xunit" Version="28.0.0" />
   </ItemGroup>
 </Project>

@@ -1,0 +1,15 @@
+{
+  "type": "assistant",
+  "message": {
+    "content": [
+      { "type": "text", "text": "Hello" },
+      {
+        "type": "tool_use",
+        "id": "tool_123",
+        "name": "Read",
+        "input": { "file_path": "/test.txt" }
+      }
+    ],
+    "model": "claude-opus-4-1-20250805"
+  }
+}

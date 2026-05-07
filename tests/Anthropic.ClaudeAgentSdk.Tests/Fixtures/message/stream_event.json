@@ -1,0 +1,10 @@
+{
+  "type": "stream_event",
+  "uuid": "stream-uuid-1",
+  "session_id": "session-1",
+  "event": {
+    "type": "content_block_delta",
+    "index": 0,
+    "delta": { "type": "text_delta", "text": "partial..." }
+  }
+}

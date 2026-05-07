@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>AotSmoke</AssemblyName>
+    <RootNamespace>AotSmoke</RootNamespace>
+
+    <!-- This harness exists solely to publish-AOT against the core SDK and
+         flush out IL2*/IL3* warnings before the per-PR CI gate (Phase 15.4)
+         lands. It is invoked manually at each Phase-3+ checkpoint via
+         `dotnet publish eng/aot-smoke -c Release -r <rid> -p:PublishAot=true`. -->
+    <PublishAot>true</PublishAot>
+    <IsAotCompatible>true</IsAotCompatible>
+
+    <!-- Not a shipping package; never restored from NuGet. -->
+    <IsPackable>false</IsPackable>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+
+    <!-- AOT publish needs an invariant runtime baseline; the core SDK can
+         tolerate either, but pinning here keeps the harness deterministic. -->
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Anthropic.ClaudeAgentSdk\Anthropic.ClaudeAgentSdk.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,6 @@
+{
+  "type": "tool_use",
+  "id": "tool_456",
+  "name": "Read",
+  "input": { "file_path": "/example.txt" }
+}
