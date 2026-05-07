@@ -26,6 +26,17 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Daystrom.ClaudeAgentSdk\Daystrom.ClaudeAgentSdk.csproj" />
+    <!--
+      Subprocess fixture binary backing ProcessGracefulShutdownTests and
+      SubprocessCliTransportTests. ReferenceOutputAssembly=false since we
+      don't link against it; we just need the binary built before the test
+      runner spawns it.
+    -->
+    <ProjectReference
+      Include="..\Daystrom.ClaudeAgentSdk.Tests.SubprocessFixture\Daystrom.ClaudeAgentSdk.Tests.SubprocessFixture.csproj"
+      ReferenceOutputAssembly="false"
+      OutputItemType="SubprocessFixtureBinary"
+    />
   </ItemGroup>
 
   <!--

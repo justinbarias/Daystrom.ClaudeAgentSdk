@@ -22,11 +22,13 @@
   </PropertyGroup>
 
   <!--
-    Native runtime sub-package wiring lands in Phase 4 with CliBinaryResolver.
-    See plan PR sequence: this csproj is intentionally dependency-free in Phase 3
-    so wire-type compilation has the smallest possible surface to verify AOT
-    cleanliness against.
+    Phase 4 brings the first runtime dependency: Microsoft.Extensions.Logging.Abstractions
+    so CliBinaryResolver can emit the native-Windows sandbox warning through ILogger.
+    The package is tiny and AOT-clean; no other runtime dependencies are wired in yet.
   -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+  </ItemGroup>
 
   <!-- ClaudeAgentJsonContext is internal by design (spec §11). The test
        project and the AOT smoke harness need to instantiate it to verify

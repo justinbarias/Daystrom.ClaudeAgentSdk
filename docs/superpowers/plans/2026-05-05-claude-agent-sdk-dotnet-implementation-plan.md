@@ -120,8 +120,8 @@ Phase 3 (first real PackageReference).
 `windows-latest`, `macos-latest`), running `dotnet restore`, `dotnet build`,
 `dotnet test`. No code coverage yet (added in Phase 15).
 **Acceptance:**
-- [ ] Push to a feature branch triggers all three matrix legs and they pass.
-  *(Authored in 07d7f49; verification deferred until a remote is added.)*
+- [x] Push to a feature branch triggers all three matrix legs and they pass.
+  *(Authored in 07d7f49; verified once remote was added — CI green on Linux/macOS/Windows.)*
 **Verification:** Green check on a draft PR.
 **Dependencies:** 1.2.
 **Files:** `.github/workflows/ci.yml`.
@@ -138,8 +138,8 @@ added a Linux-only `format` job to `ci.yml` that runs
 **Verification:** ✅ Done in d16ff6c.
 
 ### Checkpoint: Phase 1
-- [ ] Empty solution builds and tests on Linux, macOS, Windows in CI.
-  *(Locally verified on macOS; cross-OS verification deferred until remote.)*
+- [x] Empty solution builds and tests on Linux, macOS, Windows in CI.
+  *(Verified across the matrix once remote was wired up.)*
 - [x] Central Package Management + Nullable + WarningsAsErrors verified by
   attempting to add a project that omits each — build fails as expected.
   *(Nullable + WoE fully verified via smoke csproj; CPM enforcement
@@ -159,11 +159,11 @@ Phases 3–4.
 drop binary into the matching `runtimes/{rid}/native/` folder. Idempotent;
 fails loudly if upstream tarball is missing.
 **Acceptance:**
-- [ ] Run on Linux: drops `claude` into `linux-x64` and `linux-arm64` payload
+- [x] Run on Linux: drops `claude` into `linux-x64` and `linux-arm64` payload
   folders.
-- [ ] Run on macOS: drops `claude` into `osx-x64` and `osx-arm64`.
-- [ ] Run on Windows: drops `claude.exe` into `win-x64`.
-- [ ] Re-running with the cache populated is a no-op.
+- [x] Run on macOS: drops `claude` into `osx-x64` and `osx-arm64`.
+- [x] Run on Windows: drops `claude.exe` into `win-x64`.
+- [x] Re-running with the cache populated is a no-op.
 **Verification:** Hash of dropped binary matches the upstream npm tarball's
 declared SHA.
 **Dependencies:** 1.2.
@@ -175,9 +175,9 @@ declared SHA.
 `<IncludeBuildOutput>false</IncludeBuildOutput>`, packs only
 `runtimes/{rid}/native/**` payload, no compile sources.
 **Acceptance:**
-- [ ] `dotnet pack` on each produces a `.nupkg` whose contents are *only* the
+- [x] `dotnet pack` on each produces a `.nupkg` whose contents are *only* the
   binary under `runtimes/{rid}/native/`.
-- [ ] Package size is within the budget noted in `RELEASING.md`.
+- [x] Package size is within the budget noted in `RELEASING.md`.
 **Verification:** `nuget verify` and a manual unzip check on each `.nupkg`.
 **Dependencies:** 2.1.
 **Files:** 5 × `runtime.{rid}.Daystrom.ClaudeAgentSdk.Native.csproj`.
@@ -187,15 +187,15 @@ declared SHA.
 and `workflow_dispatch`. Runs `download-claude-cli.ps1`, packs five sub-
 packages, attaches as artifacts.
 **Acceptance:**
-- [ ] Manual dispatch produces five artifacts on the run summary page.
+- [x] Manual dispatch produces five artifacts on the run summary page.
 **Verification:** Artifacts can be downloaded and installed via `dotnet add
 package` from a local feed.
 **Dependencies:** 2.2.
 **Files:** `.github/workflows/native-bundle.yml`, `eng/pack-native.ps1`.
 
 ### Checkpoint: Phase 2
-- [ ] All five RID packages build, pack, and contain only the binary payload.
-- [ ] CI tag-trigger smoke-tested on a throwaway tag.
+- [x] All five RID packages build, pack, and contain only the binary payload.
+- [x] CI tag-trigger smoke-tested on a throwaway tag.
 
 ---
 

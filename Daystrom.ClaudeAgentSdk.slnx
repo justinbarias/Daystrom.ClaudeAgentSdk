@@ -4,6 +4,7 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Daystrom.ClaudeAgentSdk.Tests/Daystrom.ClaudeAgentSdk.Tests.csproj" />
+    <Project Path="tests/Daystrom.ClaudeAgentSdk.Tests.SubprocessFixture/Daystrom.ClaudeAgentSdk.Tests.SubprocessFixture.csproj" />
   </Folder>
   <Folder Name="/eng/">
     <Project Path="eng/aot-smoke/AotSmoke.csproj" />
