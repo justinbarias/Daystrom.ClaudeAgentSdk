@@ -1,0 +1,30 @@
+{
+  "$comment": "Pinned SHA-256 of upstream npm tarballs per RID, scoped by ClaudeCliVersion. Bump in lockstep with eng/Versions.props ClaudeCliVersion.",
+  "2.1.126": {
+    "linux-x64": {
+      "package": "@anthropic-ai/claude-code-linux-x64",
+      "sha256": "7e4a55bdc7a02c0f593a3fbf3cbd384420a0635171f9cdb3dacfb0cfe3ca591f",
+      "binary": "claude"
+    },
+    "linux-arm64": {
+      "package": "@anthropic-ai/claude-code-linux-arm64",
+      "sha256": "5c3e8a6dc17ed9dcef3c04423fc864a6973ab72d63768b7c32b1506157e99855",
+      "binary": "claude"
+    },
+    "osx-x64": {
+      "package": "@anthropic-ai/claude-code-darwin-x64",
+      "sha256": "0aa89a9bfc0b3667bc652c21df2e8cb09a26b32f8c4faf11b94d2128b96acffc",
+      "binary": "claude"
+    },
+    "osx-arm64": {
+      "package": "@anthropic-ai/claude-code-darwin-arm64",
+      "sha256": "8ef17e23ed2987a3fdd39beae7750acef7b45026c9b7a9384d98a8808c4ba5f8",
+      "binary": "claude"
+    },
+    "win-x64": {
+      "package": "@anthropic-ai/claude-code-win32-x64",
+      "sha256": "a1adedf7d5255eb5dc3240ed1bc2097fba5c6ec7994da5c72a564b6b162b5aad",
+      "binary": "claude.exe"
+    }
+  }
+}
