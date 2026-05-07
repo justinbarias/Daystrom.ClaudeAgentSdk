@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <NativeRid>osx-x64</NativeRid>
+    <PackageId>runtime.osx-x64.Daystrom.ClaudeAgentSdk.Native</PackageId>
+  </PropertyGroup>
+</Project>

@@ -7,7 +7,7 @@
     a small set of scripted prompts chosen to elicit each top-level Message
     variant and ContentBlock variant the SDK needs to round-trip through
     its source-gen serializer. Captured NDJSON is split per-variant and
-    written under tests/Anthropic.ClaudeAgentSdk.Tests/Fixtures/.
+    written under tests/Daystrom.ClaudeAgentSdk.Tests/Fixtures/.
 
     Prerequisite: the ANTHROPIC_API_KEY environment variable must be set,
     and a bundled `claude` binary must exist at:
@@ -32,7 +32,7 @@
 
 [CmdletBinding()]
 param(
-    [string]$OutputDir = "$PSScriptRoot/../tests/Anthropic.ClaudeAgentSdk.Tests/Fixtures",
+    [string]$OutputDir = "$PSScriptRoot/../tests/Daystrom.ClaudeAgentSdk.Tests/Fixtures",
     [string]$ClaudePath
 )
 
@@ -51,7 +51,7 @@ if (-not $ClaudePath) {
     if (-not $rid) { throw "Unable to determine host RID from `dotnet --info`." }
 
     $exe = if ($IsWindows) { 'claude.exe' } else { 'claude' }
-    $ClaudePath = "$PSScriptRoot/../src/runtimes/runtime.$rid.Anthropic.ClaudeAgentSdk.Native/runtimes/$rid/native/$exe"
+    $ClaudePath = "$PSScriptRoot/../src/runtimes/runtime.$rid.Daystrom.ClaudeAgentSdk.Native/runtimes/$rid/native/$exe"
 }
 
 if (-not (Test-Path $ClaudePath)) {

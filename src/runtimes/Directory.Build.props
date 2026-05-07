@@ -1,11 +1,11 @@
 <Project>
   <!--
-    Shared properties for the five runtime.{rid}.Anthropic.ClaudeAgentSdk.Native
+    Shared properties for the five runtime.{rid}.Daystrom.ClaudeAgentSdk.Native
     csprojs. Each child csproj only needs to set <NativeRid> and <PackageId>.
 
     These projects do not produce compile output; they exist solely to pack
     a single native binary from runtimes/{rid}/native/ into a NuGet package
-    that consumers of Anthropic.ClaudeAgentSdk pick up via NuGet's
+    that consumers of Daystrom.ClaudeAgentSdk pick up via NuGet's
     runtime-asset resolution.
 
     Phase 2 / Task 2.2 of the implementation plan.
@@ -41,7 +41,7 @@
     <PackageProjectUrl>https://github.com/jbarias/claude-agent-sdk-dotnet</PackageProjectUrl>
     <RepositoryUrl>https://github.com/jbarias/claude-agent-sdk-dotnet</RepositoryUrl>
     <PackageTags>anthropic;claude;agent;sdk;native;cli</PackageTags>
-    <PackageDescription>Native `claude` CLI binary for $(NativeRid). Internal runtime payload for Anthropic.ClaudeAgentSdk; not consumed directly.</PackageDescription>
+    <PackageDescription>Native `claude` CLI binary for $(NativeRid). Internal runtime payload for Daystrom.ClaudeAgentSdk; not consumed directly.</PackageDescription>
   </PropertyGroup>
 
   <ItemGroup>

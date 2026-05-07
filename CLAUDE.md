@@ -67,14 +67,14 @@ These constraints come from the spec and shape how code must be written.
 Violating them creates rework, not just style nits.
 
 **1. Python-SDK parity over .NET cleverness.** Internals in
-`Anthropic.ClaudeAgentSdk` mirror `claude_agent_sdk/_internal/` closely so
+`Daystrom.ClaudeAgentSdk` mirror `claude_agent_sdk/_internal/` closely so
 upstream changes can be tracked mechanically. When in doubt, read the
 Python source and match its structure. Idiomaticity belongs at the public
 API surface (records, `IAsyncEnumerable<T>`, fluent builders, attributes,
 `CancellationToken`, `*Async` suffix) — not in the transport, command
 builder, or control protocol.
 
-**2. The core package is AOT-compatible.** `Anthropic.ClaudeAgentSdk`
+**2. The core package is AOT-compatible.** `Daystrom.ClaudeAgentSdk`
 declares `<IsAotCompatible>true</IsAotCompatible>` and Phase 15.4 enforces
 zero `IL2*`/`IL3*` warnings. Concretely: no reflection on hot paths, all
 wire JSON goes through `ClaudeAgentJsonContext` (STJ source-gen) with
@@ -99,7 +99,7 @@ and Source Link are pre-wired in `Directory.Build.props`.
 order is: `options.CliPath` → bundled native at
 `AppContext.BaseDirectory/runtimes/{rid}/native/claude{,.exe}` → `PATH` →
 the same npm/local fallback list Python uses. Don't reorder this; it's
-what lets `dotnet add package Anthropic.ClaudeAgentSdk` work with no
+what lets `dotnet add package Daystrom.ClaudeAgentSdk` work with no
 extra installs.
 
 **7. Sandbox is a no-op on native Windows.** The CLI doesn't sandbox on
@@ -153,7 +153,7 @@ These are easy to violate and expensive to roll back.
 
 - xUnit + `Verify.Xunit` for snapshot tests (notably `CommandBuilderTests`
   asserting exact argv per option permutation).
-- `FakeTransport` (in `Anthropic.ClaudeAgentSdk.Testing`) is the right tool
+- `FakeTransport` (in `Daystrom.ClaudeAgentSdk.Testing`) is the right tool
   for control-protocol, hook, and MCP routing tests. Don't spawn real
   processes in unit tests.
 - Bug fixes get a regression test that fails before the fix and passes

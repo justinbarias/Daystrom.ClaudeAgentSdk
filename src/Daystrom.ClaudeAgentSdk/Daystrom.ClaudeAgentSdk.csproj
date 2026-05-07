@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Daystrom.ClaudeAgentSdk</RootNamespace>
+    <AssemblyName>Daystrom.ClaudeAgentSdk</AssemblyName>
+
+    <!-- Core library opts in to AOT-compatibility (overrides the false default
+         in the repo-level Directory.Build.props). The CI gate that enforces
+         zero IL2*/IL3* warnings on PublishAot is added in Phase 15.4; until
+         then, eng/aot-smoke is published manually at each phase checkpoint. -->
+    <IsAotCompatible>true</IsAotCompatible>
+
+    <!-- Public package metadata (spec §19 row "core"). -->
+    <PackageId>Daystrom.ClaudeAgentSdk</PackageId>
+    <PackageDescription>.NET SDK for the Claude Agent SDK. Wraps the bundled `claude` CLI and speaks the same stream-json wire protocol as the Python SDK. Zero-install: `dotnet add package` brings the CLI with it.</PackageDescription>
+    <PackageTags>anthropic;claude;agent;sdk;ai;llm</PackageTags>
+    <PackageProjectUrl>https://github.com/jbarias/claude-agent-sdk-dotnet</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/jbarias/claude-agent-sdk-dotnet</RepositoryUrl>
+
+    <!-- Generate XML doc file for IntelliSense; spec §18 acceptance criterion. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <!--
+    Phase 4 brings the first runtime dependency: Microsoft.Extensions.Logging.Abstractions
+    so CliBinaryResolver can emit the native-Windows sandbox warning through ILogger.
+    The package is tiny and AOT-clean; no other runtime dependencies are wired in yet.
+  -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+  </ItemGroup>
+
+  <!-- ClaudeAgentJsonContext is internal by design (spec §11). The test
+       project and the AOT smoke harness need to instantiate it to verify
+       round-trip + AOT cleanliness; both are friend assemblies. -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="Daystrom.ClaudeAgentSdk.Tests" />
+    <InternalsVisibleTo Include="AotSmoke" />
+  </ItemGroup>
+</Project>

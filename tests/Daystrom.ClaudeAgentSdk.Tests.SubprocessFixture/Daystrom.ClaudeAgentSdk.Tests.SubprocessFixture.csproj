@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Daystrom.ClaudeAgentSdk.Tests.SubprocessFixture</RootNamespace>
+    <AssemblyName>Daystrom.ClaudeAgentSdk.Tests.SubprocessFixture</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <!-- Tests don't need AOT; reflection is fine here. -->
+    <IsAotCompatible>false</IsAotCompatible>
+  </PropertyGroup>
+</Project>

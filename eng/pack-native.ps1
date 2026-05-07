@@ -1,7 +1,7 @@
 #!/usr/bin/env pwsh
 <#
 .SYNOPSIS
-  Pack the five RID-specific runtime.{rid}.Anthropic.ClaudeAgentSdk.Native
+  Pack the five RID-specific runtime.{rid}.Daystrom.ClaudeAgentSdk.Native
   csprojs into NuGet packages.
 
 .DESCRIPTION
@@ -49,12 +49,12 @@ foreach ($r in $Rid) {
         throw "Unknown RID '$r' (known: $($AllRids -join ', '))"
     }
 
-    $csprojPath = Join-Path $RuntimesRoot "runtime.$r.Anthropic.ClaudeAgentSdk.Native/runtime.$r.Anthropic.ClaudeAgentSdk.Native.csproj"
+    $csprojPath = Join-Path $RuntimesRoot "runtime.$r.Daystrom.ClaudeAgentSdk.Native/runtime.$r.Daystrom.ClaudeAgentSdk.Native.csproj"
     if (-not (Test-Path -LiteralPath $csprojPath)) {
         throw "Project not found: $csprojPath"
     }
 
-    Write-Host "::group::pack runtime.$r.Anthropic.ClaudeAgentSdk.Native"
+    Write-Host "::group::pack runtime.$r.Daystrom.ClaudeAgentSdk.Native"
     & dotnet pack $csprojPath `
         --configuration $Configuration `
         --output $OutputDir `

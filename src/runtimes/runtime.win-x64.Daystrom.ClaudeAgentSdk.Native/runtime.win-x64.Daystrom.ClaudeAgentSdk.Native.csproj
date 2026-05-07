@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <NativeRid>win-x64</NativeRid>
+    <PackageId>runtime.win-x64.Daystrom.ClaudeAgentSdk.Native</PackageId>
+  </PropertyGroup>
+</Project>

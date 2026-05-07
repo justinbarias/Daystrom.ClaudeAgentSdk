@@ -1,0 +1,19 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Daystrom.ClaudeAgentSdk/Daystrom.ClaudeAgentSdk.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Daystrom.ClaudeAgentSdk.Tests/Daystrom.ClaudeAgentSdk.Tests.csproj" />
+    <Project Path="tests/Daystrom.ClaudeAgentSdk.Tests.SubprocessFixture/Daystrom.ClaudeAgentSdk.Tests.SubprocessFixture.csproj" />
+  </Folder>
+  <Folder Name="/eng/">
+    <Project Path="eng/aot-smoke/AotSmoke.csproj" />
+  </Folder>
+  <Folder Name="/runtimes/">
+    <Project Path="src/runtimes/runtime.linux-arm64.Daystrom.ClaudeAgentSdk.Native/runtime.linux-arm64.Daystrom.ClaudeAgentSdk.Native.csproj" />
+    <Project Path="src/runtimes/runtime.linux-x64.Daystrom.ClaudeAgentSdk.Native/runtime.linux-x64.Daystrom.ClaudeAgentSdk.Native.csproj" />
+    <Project Path="src/runtimes/runtime.osx-arm64.Daystrom.ClaudeAgentSdk.Native/runtime.osx-arm64.Daystrom.ClaudeAgentSdk.Native.csproj" />
+    <Project Path="src/runtimes/runtime.osx-x64.Daystrom.ClaudeAgentSdk.Native/runtime.osx-x64.Daystrom.ClaudeAgentSdk.Native.csproj" />
+    <Project Path="src/runtimes/runtime.win-x64.Daystrom.ClaudeAgentSdk.Native/runtime.win-x64.Daystrom.ClaudeAgentSdk.Native.csproj" />
+  </Folder>
+</Solution>

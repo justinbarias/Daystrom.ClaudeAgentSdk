@@ -86,11 +86,11 @@ A control protocol layered over the same stdio handles:
 
 | Package | Depends on | Purpose |
 |---|---|---|
-| `Anthropic.ClaudeAgentSdk` | STJ, `Microsoft.Extensions.Logging.Abstractions`, runtime native sub-packages | Core: `ClaudeAgent.QueryAsync`, `IClaudeAgentClient`, options, messages, hooks, permissions, sessions, transport, control protocol |
-| `Anthropic.ClaudeAgentSdk.Mcp` | core + `ModelContextProtocol` | In-process MCP server helpers (attribute + fluent) |
-| `Anthropic.ClaudeAgentSdk.DependencyInjection` | core + `Microsoft.Extensions.DependencyInjection.Abstractions` + `Microsoft.Extensions.Options.ConfigurationExtensions` | `services.AddClaudeAgent()`, `IOptions<>` binding, `AddClaudeAgentHook<T>()` |
-| `Anthropic.ClaudeAgentSdk.Testing` | core | `FakeTransport`, `RecordingTransport`, `ClaudeAgentClientHarness` |
-| `runtime.{rid}.Anthropic.ClaudeAgentSdk.Native` × 5 RIDs | (none) | The pinned `claude` Node binary for one RID, packed under `runtimes/{rid}/native/` |
+| `Daystrom.ClaudeAgentSdk` | STJ, `Microsoft.Extensions.Logging.Abstractions`, runtime native sub-packages | Core: `ClaudeAgent.QueryAsync`, `IClaudeAgentClient`, options, messages, hooks, permissions, sessions, transport, control protocol |
+| `Daystrom.ClaudeAgentSdk.Mcp` | core + `ModelContextProtocol` | In-process MCP server helpers (attribute + fluent) |
+| `Daystrom.ClaudeAgentSdk.DependencyInjection` | core + `Microsoft.Extensions.DependencyInjection.Abstractions` + `Microsoft.Extensions.Options.ConfigurationExtensions` | `services.AddClaudeAgent()`, `IOptions<>` binding, `AddClaudeAgentHook<T>()` |
+| `Daystrom.ClaudeAgentSdk.Testing` | core | `FakeTransport`, `RecordingTransport`, `ClaudeAgentClientHarness` |
+| `runtime.{rid}.Daystrom.ClaudeAgentSdk.Native` × 5 RIDs | (none) | The pinned `claude` Node binary for one RID, packed under `runtimes/{rid}/native/` |
 
 Supported RIDs: `win-x64`, `linux-x64`, `linux-arm64`, `osx-x64`, `osx-arm64`.
 
@@ -108,21 +108,21 @@ claude-agent-sdk-dotnet/
 ├── RELEASING.md
 ├── nuget.config
 ├── src/
-│   ├── Anthropic.ClaudeAgentSdk/
-│   ├── Anthropic.ClaudeAgentSdk.Mcp/
-│   ├── Anthropic.ClaudeAgentSdk.DependencyInjection/
-│   ├── Anthropic.ClaudeAgentSdk.Testing/
+│   ├── Daystrom.ClaudeAgentSdk/
+│   ├── Daystrom.ClaudeAgentSdk.Mcp/
+│   ├── Daystrom.ClaudeAgentSdk.DependencyInjection/
+│   ├── Daystrom.ClaudeAgentSdk.Testing/
 │   └── runtimes/
-│       ├── runtime.win-x64.Anthropic.ClaudeAgentSdk.Native/
-│       ├── runtime.linux-x64.Anthropic.ClaudeAgentSdk.Native/
-│       ├── runtime.linux-arm64.Anthropic.ClaudeAgentSdk.Native/
-│       ├── runtime.osx-x64.Anthropic.ClaudeAgentSdk.Native/
-│       └── runtime.osx-arm64.Anthropic.ClaudeAgentSdk.Native/
+│       ├── runtime.win-x64.Daystrom.ClaudeAgentSdk.Native/
+│       ├── runtime.linux-x64.Daystrom.ClaudeAgentSdk.Native/
+│       ├── runtime.linux-arm64.Daystrom.ClaudeAgentSdk.Native/
+│       ├── runtime.osx-x64.Daystrom.ClaudeAgentSdk.Native/
+│       └── runtime.osx-arm64.Daystrom.ClaudeAgentSdk.Native/
 ├── tests/
-│   ├── Anthropic.ClaudeAgentSdk.Tests/
-│   ├── Anthropic.ClaudeAgentSdk.Mcp.Tests/
-│   ├── Anthropic.ClaudeAgentSdk.DependencyInjection.Tests/
-│   └── Anthropic.ClaudeAgentSdk.IntegrationTests/
+│   ├── Daystrom.ClaudeAgentSdk.Tests/
+│   ├── Daystrom.ClaudeAgentSdk.Mcp.Tests/
+│   ├── Daystrom.ClaudeAgentSdk.DependencyInjection.Tests/
+│   └── Daystrom.ClaudeAgentSdk.IntegrationTests/
 ├── samples/
 │   ├── QuickStart/
 │   ├── StreamingMode/
@@ -146,7 +146,7 @@ claude-agent-sdk-dotnet/
     └── superpowers/specs/
 ```
 
-## 7. Core project layout (`src/Anthropic.ClaudeAgentSdk/`)
+## 7. Core project layout (`src/Daystrom.ClaudeAgentSdk/`)
 
 Mirrors `claude_agent_sdk/_internal/` plus a public top-level surface.
 
@@ -445,7 +445,7 @@ public abstract record PermissionResult
 }
 ```
 
-### MCP (in `Anthropic.ClaudeAgentSdk.Mcp`)
+### MCP (in `Daystrom.ClaudeAgentSdk.Mcp`)
 
 ```csharp
 public static class SdkMcpServer
@@ -469,7 +469,7 @@ resulting MCP `IMcpServer` instance into `IMcpServerInstance` for the core
 `McpSdkServerConfig`. The `ControlProtocol` in the core package routes CLI
 tool-call requests to this instance and serializes the response back.
 
-### DI (in `Anthropic.ClaudeAgentSdk.DependencyInjection`)
+### DI (in `Daystrom.ClaudeAgentSdk.DependencyInjection`)
 
 ```csharp
 public static class ClaudeAgentServiceCollectionExtensions
@@ -582,11 +582,11 @@ has to trust.
 - `eng/download-claude-cli.ps1` (cross-platform PowerShell):
   1. `npm pack @anthropic-ai/claude-code@$(ClaudeCliVersion)` for each RID.
   2. Extract per-RID native binary.
-  3. Drop into `src/runtimes/runtime.{rid}.Anthropic.ClaudeAgentSdk.Native/runtimes/{rid}/native/claude{,.exe}`.
-- Each `runtime.{rid}.Anthropic.ClaudeAgentSdk.Native.csproj` is
+  3. Drop into `src/runtimes/runtime.{rid}.Daystrom.ClaudeAgentSdk.Native/runtimes/{rid}/native/claude{,.exe}`.
+- Each `runtime.{rid}.Daystrom.ClaudeAgentSdk.Native.csproj` is
   `<IncludeBuildOutput>false</IncludeBuildOutput>` and packs only the
   `runtimes/{rid}/native/**` payload.
-- `Anthropic.ClaudeAgentSdk.csproj` references all five with
+- `Daystrom.ClaudeAgentSdk.csproj` references all five with
   `<PrivateAssets>none</PrivateAssets>` and `<IncludeAssets>runtime;native</IncludeAssets>`.
   NuGet/MSBuild resolves only the matching RID at publish/restore.
 - `CliBinaryResolver` lookup order:
@@ -619,7 +619,7 @@ has to trust.
   or DI; defaults to `NullLoggerFactory.Instance`.
 - One logger per major component: `Transport`, `Control`, `MessageParser`,
   `Hooks`, `CliResolver`.
-- `EventSource` (`Anthropic-ClaudeAgentSdk`) emits start/stop/cancel events
+- `EventSource` (`Daystrom-ClaudeAgentSdk`) emits start/stop/cancel events
   for `query` and per-hook invocations — picked up by `dotnet-trace` and
   OpenTelemetry's `EventSourceListener`.
 - Active `Activity` is captured around `query()` and hook invocations so
@@ -706,7 +706,7 @@ Three distinct concepts; treat them as separate axes:
 - A separate `Hosting` package with `IHostedService`-based agents — defer
   until demand emerges; users can wrap `IClaudeAgentClient` themselves.
 - Built-in OpenTelemetry tracing package (the BCL `Activity` propagation
-  is in core; an `Anthropic.ClaudeAgentSdk.OpenTelemetry` package can come
+  is in core; an `Daystrom.ClaudeAgentSdk.OpenTelemetry` package can come
   later if needed).
 
 ## 18. Acceptance criteria
@@ -714,10 +714,10 @@ Three distinct concepts; treat them as separate axes:
 A release is shippable when:
 
 1. All public types in §7's tree exist with XML doc comments.
-2. `Anthropic.ClaudeAgentSdk` is `IsAotCompatible=true` with zero trim warnings.
+2. `Daystrom.ClaudeAgentSdk` is `IsAotCompatible=true` with zero trim warnings.
 3. `dotnet test` passes on Linux, macOS, Windows in CI.
 4. `samples/QuickStart` runs end-to-end against the bundled CLI on a clean
-   machine with no extra installs after `dotnet add package Anthropic.ClaudeAgentSdk`.
+   machine with no extra installs after `dotnet add package Daystrom.ClaudeAgentSdk`.
 5. The feature parity matrix in §19 is 100% green.
 6. `dotnet pack` produces all four user-facing packages and all five RID
    native sub-packages, each ≤ the size budget noted in `RELEASING.md`.
@@ -762,8 +762,8 @@ A release is shippable when:
 | `SandboxSettings`, `SandboxNetworkConfig`, `SandboxIgnoreViolations` | same names | core |
 | `ClaudeSDKError`, `CLIConnectionError`, `CLINotFoundError`, `ProcessError`, `CLIJSONDecodeError` | `ClaudeSdkException` + 4 subtypes | core |
 | OTel context propagation | `OtelContextInjector` (BCL `Activity`) | core |
-| Bundled CLI | `runtime.{rid}.Anthropic.ClaudeAgentSdk.Native` × 5 | native |
-| `claude_agent_sdk.testing` | `Anthropic.ClaudeAgentSdk.Testing` | testing |
+| Bundled CLI | `runtime.{rid}.Daystrom.ClaudeAgentSdk.Native` × 5 | native |
+| `claude_agent_sdk.testing` | `Daystrom.ClaudeAgentSdk.Testing` | testing |
 | (none) | `services.AddClaudeAgent()`, `IOptions<>` binding, `AddClaudeAgentHook<T>()` | dependency-injection |
 
 ## 20. Open items for follow-up plan

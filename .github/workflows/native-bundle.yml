@@ -1,6 +1,6 @@
 name: native-bundle
 
-# Builds the five runtime.{rid}.Anthropic.ClaudeAgentSdk.Native NuGet
+# Builds the five runtime.{rid}.Daystrom.ClaudeAgentSdk.Native NuGet
 # packages from the pinned <ClaudeCliVersion> in eng/Versions.props.
 #
 # Implements Phase 2 / Task 2.3 of the implementation plan.

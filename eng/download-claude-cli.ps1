@@ -2,7 +2,7 @@
 <#
 .SYNOPSIS
   Download the pinned Claude Code CLI native binary per RID and drop it into
-  the corresponding runtime.{rid}.Anthropic.ClaudeAgentSdk.Native payload
+  the corresponding runtime.{rid}.Daystrom.ClaudeAgentSdk.Native payload
   folder.
 
 .DESCRIPTION
@@ -13,7 +13,7 @@
     2. Fetch the tarball directly from the npm registry.
     3. Verify SHA-256 against the pinned value.
     4. Extract package/claude{,.exe} into
-       src/runtimes/runtime.{rid}.Anthropic.ClaudeAgentSdk.Native/runtimes/{rid}/native/.
+       src/runtimes/runtime.{rid}.Daystrom.ClaudeAgentSdk.Native/runtimes/{rid}/native/.
     5. On POSIX hosts, mark the binary executable (chmod +x). On Windows
        hosts, log a warning if a POSIX RID is requested - that case must
        be packed from a POSIX runner so NuGet preserves the executable bit.
@@ -212,7 +212,7 @@ foreach ($r in $Rid) {
 
     Invoke-DownloadAndVerify -Url $url -Destination $tarballPath -ExpectedSha256 $sha
 
-    $payloadDir = Join-Path $RuntimesRoot "runtime.$r.Anthropic.ClaudeAgentSdk.Native/runtimes/$r/native"
+    $payloadDir = Join-Path $RuntimesRoot "runtime.$r.Daystrom.ClaudeAgentSdk.Native/runtimes/$r/native"
     $binaryDestination = Join-Path $payloadDir $binary
 
     Expand-NpmTarball -TarballPath $tarballPath -Destination $binaryDestination -BinaryName $binary
