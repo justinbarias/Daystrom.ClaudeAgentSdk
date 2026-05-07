@@ -49,8 +49,8 @@ eng/.cli-cache/
 
 # Per-RID native CLI payloads dropped by eng/download-claude-cli.ps1.
 # These are ~200-250 MB each; never check in.
-src/runtimes/runtime.*.Anthropic.ClaudeAgentSdk.Native/runtimes/**/native/claude
-src/runtimes/runtime.*.Anthropic.ClaudeAgentSdk.Native/runtimes/**/native/claude.exe
+src/runtimes/runtime.*.Daystrom.ClaudeAgentSdk.Native/runtimes/**/native/claude
+src/runtimes/runtime.*.Daystrom.ClaudeAgentSdk.Native/runtimes/**/native/claude.exe
 
 # Local secrets
 *.local

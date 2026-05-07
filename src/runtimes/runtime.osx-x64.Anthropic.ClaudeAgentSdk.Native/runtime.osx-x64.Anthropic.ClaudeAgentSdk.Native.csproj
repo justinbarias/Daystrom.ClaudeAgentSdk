@@ -1,6 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <NativeRid>osx-x64</NativeRid>
-    <PackageId>runtime.osx-x64.Anthropic.ClaudeAgentSdk.Native</PackageId>
-  </PropertyGroup>
-</Project>

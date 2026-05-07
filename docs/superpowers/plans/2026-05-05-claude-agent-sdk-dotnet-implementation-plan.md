@@ -86,9 +86,9 @@ all three CI OSes.
 - [x] `dotnet build` on the empty `.sln` succeeds.
 **Verification:** `dotnet build && dotnet test` exits 0. ✅ Done in 6c4153e.
 Note: .NET 10's `dotnet new sln` defaults to `.slnx`, so the solution
-is `claude-agent-sdk-dotnet.slnx`, not `.sln`.
+is `Daystrom.ClaudeAgentSdk.slnx`, not `.sln`.
 **Dependencies:** None.
-**Files:** `claude-agent-sdk-dotnet.slnx`, `global.json`, `LICENSE`, `README.md`,
+**Files:** `Daystrom.ClaudeAgentSdk.slnx`, `global.json`, `LICENSE`, `README.md`,
 `CHANGELOG.md`, `RELEASING.md`, `.gitignore`, `nuget.config`.
 
 ### Task 1.2: Central build configuration — S
@@ -171,7 +171,7 @@ declared SHA.
 
 ### Task 2.2: Five RID native csproj projects — S × 5
 **Description:** One csproj per RID under
-`src/runtimes/runtime.{rid}.Anthropic.ClaudeAgentSdk.Native/`. Each is
+`src/runtimes/runtime.{rid}.Daystrom.ClaudeAgentSdk.Native/`. Each is
 `<IncludeBuildOutput>false</IncludeBuildOutput>`, packs only
 `runtimes/{rid}/native/**` payload, no compile sources.
 **Acceptance:**
@@ -180,7 +180,7 @@ declared SHA.
 - [ ] Package size is within the budget noted in `RELEASING.md`.
 **Verification:** `nuget verify` and a manual unzip check on each `.nupkg`.
 **Dependencies:** 2.1.
-**Files:** 5 × `runtime.{rid}.Anthropic.ClaudeAgentSdk.Native.csproj`.
+**Files:** 5 × `runtime.{rid}.Daystrom.ClaudeAgentSdk.Native.csproj`.
 
 ### Task 2.3: Native bundle workflow — S
 **Description:** `.github/workflows/native-bundle.yml` triggered on `v*` tags
@@ -209,23 +209,23 @@ the source-gen context, and round-trips through saved Python fixtures.
 `CliNotFoundException`, `ProcessException` (with `ExitCode`, `Stderr`),
 `CliJsonDecodeException` (with `RawLine`).
 **Acceptance:**
-- [ ] All five types compile, are `sealed` where appropriate, have XML doc
+- [x] All five types compile, are `sealed` where appropriate, have XML doc
   comments.
 **Verification:** Smoke unit test instantiates each and serializes its
-`.Message`/`.ToString()`.
+`.Message`/`.ToString()`. ✅ Done in 7739696.
 **Dependencies:** 1.2.
-**Files:** `src/Anthropic.ClaudeAgentSdk/Errors/*.cs`.
+**Files:** `src/Daystrom.ClaudeAgentSdk/Errors/*.cs`.
 
 ### Task 3.2: Enums and small DTOs — S
 **Description:** `PermissionMode`, `SettingSource`, `SdkBeta`,
 `HookEvent`, `ServerToolName`, `RateLimitType`, `ContextUsageCategory`,
 `McpServerStatusConfig`, `McpServerConnectionStatus`, `SessionStoreFlushMode`.
 **Acceptance:**
-- [ ] Each enum has a `[JsonStringEnumConverter]` (snake-case lower) attribute
+- [x] Each enum has a `[JsonStringEnumConverter]` (snake-case lower) attribute
   on the property, *not* the type, so STJ source-gen stays happy.
-**Verification:** Round-trip enum → JSON → enum for every member.
+**Verification:** Round-trip enum → JSON → enum for every member. ✅ Done in 7739696.
 **Dependencies:** 3.1.
-**Files:** `src/Anthropic.ClaudeAgentSdk/{PermissionMode,SettingSource,...}.cs`.
+**Files:** `src/Daystrom.ClaudeAgentSdk/{PermissionMode,SettingSource,...}.cs`.
 
 ### Task 3.3: Content blocks discriminated union — M
 **Description:** `Messages/Content/ContentBlock.cs` (abstract record) +
@@ -233,13 +233,13 @@ variants: `TextBlock`, `ThinkingBlock`, `ToolUseBlock`, `ToolResultBlock`,
 `ServerToolUseBlock`, `ServerToolResultBlock`. `[JsonPolymorphic]` with
 `type` discriminator.
 **Acceptance:**
-- [ ] All six variants round-trip through Python-fixture JSON.
-- [ ] Unknown discriminator throws `CliJsonDecodeException`, not
+- [x] All six variants round-trip through Python-fixture JSON.
+- [x] Unknown discriminator throws `CliJsonDecodeException`, not
   `JsonException`.
 **Verification:** `MessageParserTests.RoundTripsAllPythonFixtures` passes for
-content-block fixtures.
+content-block fixtures. ✅ Done in 7739696.
 **Dependencies:** 3.1, 3.2.
-**Files:** `src/Anthropic.ClaudeAgentSdk/Messages/Content/*.cs`.
+**Files:** `src/Daystrom.ClaudeAgentSdk/Messages/Content/*.cs`.
 
 ### Task 3.4: Top-level Message variants — M
 **Description:** `Messages/Message.cs` abstract + `AssistantMessage`,
@@ -248,12 +248,12 @@ content-block fixtures.
 helper records: `RateLimitInfo`, `RateLimitEvent`, `RateLimitStatus`,
 `ContextUsageResponse`, `TaskUsage`, `TaskBudget`.
 **Acceptance:**
-- [ ] All variants round-trip through fixtures.
-- [ ] `ResultMessage` shape is byte-identical between one-shot and streaming
+- [x] All variants round-trip through fixtures.
+- [x] `ResultMessage` shape is byte-identical between one-shot and streaming
   fixtures (this is what makes Phase 5's fast path safe).
-**Verification:** `MessageParserTests` for every variant.
+**Verification:** `MessageParserTests` for every variant. ✅ Done in 7739696.
 **Dependencies:** 3.3.
-**Files:** `src/Anthropic.ClaudeAgentSdk/Messages/*.cs`.
+**Files:** `src/Daystrom.ClaudeAgentSdk/Messages/*.cs`.
 
 ### Task 3.5: Hook input/output records — M (bag of mechanical S tasks)
 **Description:** `Hooks/HookContext.cs`, `HookMatcher.cs`, `HookResult.cs`
@@ -262,13 +262,13 @@ helper records: `RateLimitInfo`, `RateLimitEvent`, `RateLimitStatus`,
 under `Hooks/Outputs/`. `IHookHandler<TInput>`, `HookHandler<TInput>` and
 non-generic `HookHandler` delegates.
 **Acceptance:**
-- [ ] Each hook input round-trips through Python fixture.
-- [ ] The non-generic erased `HookHandler` delegate compiles and accepts a
+- [x] Each hook input round-trips through Python fixture.
+- [x] The non-generic erased `HookHandler` delegate compiles and accepts a
   closure over a strongly-typed `HookHandler<TInput>` (proves the wrapping
   story works).
-**Verification:** `HookSerializationTests` per variant.
+**Verification:** `HookSerializationTests` per variant. ✅ Done in 7739696.
 **Dependencies:** 3.3, 3.4.
-**Files:** `src/Anthropic.ClaudeAgentSdk/Hooks/**/*.cs`.
+**Files:** `src/Daystrom.ClaudeAgentSdk/Hooks/**/*.cs`.
 
 ### Task 3.6: Permissions, MCP, Sandbox, Thinking, Agents, Plugins types — M
 **Description:** All remaining DTOs from spec §7 that are *not* surface API:
@@ -278,13 +278,13 @@ non-generic `HookHandler` delegates.
 `SandboxSettings`, `SandboxNetworkConfig`, `SandboxIgnoreViolations`,
 `ThinkingConfig` + 3 variants, `AgentDefinition`, `SdkPluginConfig`.
 **Acceptance:**
-- [ ] All discriminated unions (`McpServerConfig`, `ThinkingConfig`,
+- [x] All discriminated unions (`McpServerConfig`, `ThinkingConfig`,
   `PermissionResult`) parse Python-fixture JSON.
-- [ ] `SandboxSettings` XML doc comment explicitly calls out the native-
+- [x] `SandboxSettings` XML doc comment explicitly calls out the native-
   Windows no-op caveat (spec §7).
-**Verification:** Round-trip tests per type.
+**Verification:** Round-trip tests per type. ✅ Done in 7739696.
 **Dependencies:** 3.3, 3.4, 3.5.
-**Files:** `src/Anthropic.ClaudeAgentSdk/{Permissions,Mcp,Sandbox,ThinkingConfig,Agents}/*.cs`.
+**Files:** `src/Daystrom.ClaudeAgentSdk/{Permissions,Mcp,Sandbox,ThinkingConfig,Agents}/*.cs`.
 
 ### Task 3.7: Session DTOs — S
 **Description:** `Sessions/{SessionKey,SessionStoreEntry,SessionStoreListEntry,
@@ -292,10 +292,10 @@ SessionListSubkeysKey,SessionSummaryEntry,SessionMessage,SDKSessionInfo,
 ForkSessionResult,MirrorErrorMessage}.cs`. No client/store *behavior* yet —
 just the records.
 **Acceptance:**
-- [ ] All round-trip through fixture JSON.
-**Verification:** Per-type round-trip tests.
+- [x] All round-trip through fixture JSON.
+**Verification:** Per-type round-trip tests. ✅ Done in 7739696.
 **Dependencies:** 3.4.
-**Files:** `src/Anthropic.ClaudeAgentSdk/Sessions/*.cs` (DTOs only).
+**Files:** `src/Daystrom.ClaudeAgentSdk/Sessions/*.cs` (DTOs only).
 
 ### Task 3.8: Source-gen JSON context — M
 **Description:** `Json/ClaudeAgentJsonContext.cs` declares `[JsonSerializable]`
@@ -303,19 +303,19 @@ for every wire type from 3.1–3.7. Snake-case lower naming policy on the
 context options. Properties whose snake-case form collides with a C# keyword
 get `[JsonPropertyName]`.
 **Acceptance:**
-- [ ] `dotnet build /p:IsTrimmed=true /p:PublishAot=true` on the core
+- [x] `dotnet build /p:IsTrimmed=true /p:PublishAot=true` on the core
   project produces zero trim and zero AOT warnings.
-- [ ] No reflection-based STJ call site exists in the core project (verified
+- [x] No reflection-based STJ call site exists in the core project (verified
   by an analyzer rule or grep in the test suite).
 **Verification:** Trim/AOT publish in CI succeeds with `--verbosity normal`
-showing no `IL2*` or `IL3*` warnings.
+showing no `IL2*` or `IL3*` warnings. ✅ Done in 7739696; direct context tests added in 6f3a1b7.
 **Dependencies:** 3.1–3.7.
-**Files:** `src/Anthropic.ClaudeAgentSdk/Json/ClaudeAgentJsonContext.cs`.
+**Files:** `src/Daystrom.ClaudeAgentSdk/Json/ClaudeAgentJsonContext.cs`.
 
 ### Checkpoint: Phase 3
-- [ ] Every wire type compiles, has XML doc comments, and round-trips through
+- [x] Every wire type compiles, has XML doc comments, and round-trips through
   at least one Python-fixture sample.
-- [ ] Core project is `IsAotCompatible=true` with zero warnings.
+- [x] Core project is `IsAotCompatible=true` with zero warnings.
 
 ---
 
@@ -336,7 +336,7 @@ gated on `CLAUDE_AGENT_SDK_SKIP_VERSION_CHECK`.
   when nothing resolves.
 **Verification:** `CliBinaryResolverTests` covers each branch.
 **Dependencies:** 3.1, 3.6 (Sandbox).
-**Files:** `src/Anthropic.ClaudeAgentSdk/Transport/CliBinaryResolver.cs`.
+**Files:** `src/Daystrom.ClaudeAgentSdk/Transport/CliBinaryResolver.cs`.
 
 ### Task 4.2: `NdjsonReader` with speculative buffering — M
 **Description:** Reads from a `Stream`, yields `JsonElement` per line.
@@ -349,7 +349,7 @@ raw line) on permanent parse failure.
 - [ ] Max-buffer overflow throws with the partial buffer in the exception.
 **Verification:** `NdjsonReaderTests` with adversarial chunking.
 **Dependencies:** 3.1.
-**Files:** `src/Anthropic.ClaudeAgentSdk/Transport/NdjsonReader.cs`.
+**Files:** `src/Daystrom.ClaudeAgentSdk/Transport/NdjsonReader.cs`.
 
 ### Task 4.3: `ProcessGracefulShutdown` — S
 **Description:** Helper encapsulating the spec §9 shutdown sequence:
@@ -363,7 +363,7 @@ close stdin → `WaitForExitAsync(5s)` → `Process.Kill(false)` →
 **Verification:** `ProcessGracefulShutdownTests` using a fixture binary
 (can be a `dotnet run` of a tiny helper).
 **Dependencies:** 3.1.
-**Files:** `src/Anthropic.ClaudeAgentSdk/Internal/ProcessGracefulShutdown.cs`.
+**Files:** `src/Daystrom.ClaudeAgentSdk/Internal/ProcessGracefulShutdown.cs`.
 
 ### Task 4.4: `OtelContextInjector` — S
 **Description:** Reads `Activity.Current`, injects `traceparent`/`tracestate`
@@ -376,7 +376,7 @@ fresh `Activity` is active *unless* `Options.Env` explicitly sets them.
   `traceparent`, not the parent process's.
 **Verification:** `OtelContextInjectorTests`.
 **Dependencies:** 3.1.
-**Files:** `src/Anthropic.ClaudeAgentSdk/Internal/OtelContextInjector.cs`.
+**Files:** `src/Daystrom.ClaudeAgentSdk/Internal/OtelContextInjector.cs`.
 
 ### Task 4.5: `ClaudeAgentOptions` record + builder — M
 **Description:** The full record from spec §8 + the fluent builder. No CLI
@@ -388,7 +388,7 @@ that produces it.
 - [ ] Every `On*` builder method is covered by a builder test.
 **Verification:** `ClaudeAgentOptionsBuilderTests`.
 **Dependencies:** 3.5, 3.6.
-**Files:** `src/Anthropic.ClaudeAgentSdk/ClaudeAgentOptions.cs`,
+**Files:** `src/Daystrom.ClaudeAgentSdk/ClaudeAgentOptions.cs`,
 `ClaudeAgentOptionsBuilder.cs`.
 
 ### Task 4.6: `CommandBuilder` — M (bag of S tasks per flag)
@@ -404,7 +404,7 @@ Sandbox merged into `--settings` JSON.
   Python output as the snapshot baseline).
 **Verification:** `CommandBuilderTests`. Snapshots checked into the repo.
 **Dependencies:** 4.5.
-**Files:** `src/Anthropic.ClaudeAgentSdk/Internal/CommandBuilder.cs`.
+**Files:** `src/Daystrom.ClaudeAgentSdk/Internal/CommandBuilder.cs`.
 
 ### Task 4.7: `ITransport` interface + `SubprocessCliTransport` (one-shot capable) — M
 **Description:** `ITransport` public extension point. Default
@@ -421,7 +421,7 @@ no control-protocol initialize handshake.
   (otherwise the pipe is left at default).
 **Verification:** `SubprocessCliTransportTests` using a fixture script.
 **Dependencies:** 4.1, 4.2, 4.3, 4.4, 4.6.
-**Files:** `src/Anthropic.ClaudeAgentSdk/Transport/{ITransport,SubprocessCliTransport}.cs`.
+**Files:** `src/Daystrom.ClaudeAgentSdk/Transport/{ITransport,SubprocessCliTransport}.cs`.
 
 ### Checkpoint: Phase 4
 - [ ] Plumbing components individually unit-tested.
@@ -446,7 +446,7 @@ line attached.
   exact byte sequence read.
 **Verification:** `MessageParserTests`.
 **Dependencies:** 3.8, 4.2.
-**Files:** `src/Anthropic.ClaudeAgentSdk/Internal/MessageParser.cs`.
+**Files:** `src/Daystrom.ClaudeAgentSdk/Internal/MessageParser.cs`.
 
 ### Task 5.2: `ControlProtocolGate` — XS
 **Description:** `Internal/ControlProtocolGate.cs` with `bool
@@ -457,7 +457,7 @@ NeedsControlProtocol(ClaudeAgentOptions, ITransport?)` returning true iff:
 - [ ] Truth table covered: 4 positive cases × 1 negative.
 **Verification:** `ControlProtocolGateTests`.
 **Dependencies:** 4.5.
-**Files:** `src/Anthropic.ClaudeAgentSdk/Internal/ControlProtocolGate.cs`.
+**Files:** `src/Daystrom.ClaudeAgentSdk/Internal/ControlProtocolGate.cs`.
 
 ### Task 5.3: `ClaudeAgent.QueryAsync(string, ...)` one-shot path — M
 **Description:** Static method. If `ControlProtocolGate.NeedsControlProtocol`
@@ -475,7 +475,7 @@ process down.
 **Verification:** `QueryOneShotTests` (unit, with fake transport) +
 `QueryOneShotIntegrationTests` (gated `CLAUDE_INTEGRATION=1`).
 **Dependencies:** 5.1, 5.2, 4.7.
-**Files:** `src/Anthropic.ClaudeAgentSdk/ClaudeAgent.cs`.
+**Files:** `src/Daystrom.ClaudeAgentSdk/ClaudeAgent.cs`.
 
 ### Task 5.4: `ClaudeAgent.SdkVersion` constant — XS
 **Description:** Public string property exposing the SDK's assembly version,
@@ -484,7 +484,7 @@ also written into `CLAUDE_AGENT_SDK_VERSION` env var by the transport.
 - [ ] Matches the version in `eng/Versions.props`.
 **Verification:** `SdkVersionTests`.
 **Dependencies:** 5.3.
-**Files:** `src/Anthropic.ClaudeAgentSdk/ClaudeAgent.cs` (partial).
+**Files:** `src/Daystrom.ClaudeAgentSdk/ClaudeAgent.cs` (partial).
 
 ### Checkpoint: Phase 5 — first shippable demo
 - [ ] `samples/QuickStart` (stub) prints a real assistant response.
@@ -510,7 +510,7 @@ serializable.
 - [ ] Each type round-trips through fixture JSON.
 **Verification:** `ControlMessagesTests`.
 **Dependencies:** 3.8.
-**Files:** `src/Anthropic.ClaudeAgentSdk/Control/ControlMessages.cs`.
+**Files:** `src/Daystrom.ClaudeAgentSdk/Control/ControlMessages.cs`.
 
 ### Task 6.2: `ControlProtocol` core — M
 **Description:** `Control/ControlProtocol.cs` — owns the request/response
@@ -526,7 +526,7 @@ spells out the v1 semantics so callers aren't surprised.
   discarded; in-flight callback still completes.
 **Verification:** `ControlProtocolTests` with scripted FakeTransport.
 **Dependencies:** 6.1, 4.7.
-**Files:** `src/Anthropic.ClaudeAgentSdk/Control/ControlProtocol.cs`.
+**Files:** `src/Daystrom.ClaudeAgentSdk/Control/ControlProtocol.cs`.
 
 ### Task 6.3: `SubprocessCliTransport` streaming-mode upgrade — S
 **Description:** Add streaming mode to the transport: don't append `--print`,
@@ -537,7 +537,7 @@ constructor parameter from `ClaudeAgentClient`.
   without deadlock.
 **Verification:** `SubprocessCliTransportStreamingTests`.
 **Dependencies:** 4.7, 6.2.
-**Files:** `src/Anthropic.ClaudeAgentSdk/Transport/SubprocessCliTransport.cs`.
+**Files:** `src/Daystrom.ClaudeAgentSdk/Transport/SubprocessCliTransport.cs`.
 
 ### Task 6.4: `ClaudeAgentClient` — M
 **Description:** Implements `IClaudeAgentClient`: `ConnectAsync` (spawn +
@@ -554,7 +554,7 @@ ack), `GetMcpStatusAsync`, `GetContextUsageAsync`,
 - [ ] `await using` scope cleanly shuts down the process.
 **Verification:** `ClaudeAgentClientTests` + integration test.
 **Dependencies:** 6.2, 6.3, 5.1.
-**Files:** `src/Anthropic.ClaudeAgentSdk/{IClaudeAgentClient,ClaudeAgentClient}.cs`.
+**Files:** `src/Daystrom.ClaudeAgentSdk/{IClaudeAgentClient,ClaudeAgentClient}.cs`.
 
 ### Task 6.5: `ClaudeAgent.QueryAsync(IAsyncEnumerable<UserMessageInput>, ...)` — S
 **Description:** The streaming-input overload. Always uses streaming path
@@ -563,7 +563,7 @@ regardless of `ControlProtocolGate`. Wraps `ClaudeAgentClient` internally.
 - [ ] Streaming-input fixture produces interleaved messages.
 **Verification:** `QueryStreamingInputTests`.
 **Dependencies:** 6.4.
-**Files:** `src/Anthropic.ClaudeAgentSdk/ClaudeAgent.cs` (partial).
+**Files:** `src/Daystrom.ClaudeAgentSdk/ClaudeAgent.cs` (partial).
 
 ### Checkpoint: Phase 6
 - [ ] Streaming client demo (`samples/StreamingMode` stub) works.
@@ -591,7 +591,7 @@ with the exception message and are logged at warn level.
 - [ ] User handler exception → `Block` response, no process crash.
 **Verification:** `HookRoutingTests` with FakeTransport scripts per event.
 **Dependencies:** 6.2, 3.5.
-**Files:** `src/Anthropic.ClaudeAgentSdk/Control/ControlProtocol.cs` (partial).
+**Files:** `src/Daystrom.ClaudeAgentSdk/Control/ControlProtocol.cs` (partial).
 
 ### Task 7.2: Builder `On*` methods — M (bag of mechanical S tasks)
 **Description:** One `On<Event>` method on `ClaudeAgentOptionsBuilder` per
@@ -602,7 +602,7 @@ the strongly-typed handler in the erased `HookHandler` form for storage.
   asserts it appears in the built options.
 **Verification:** `ClaudeAgentOptionsBuilderHookTests`.
 **Dependencies:** 7.1, 4.5.
-**Files:** `src/Anthropic.ClaudeAgentSdk/ClaudeAgentOptionsBuilder.cs` (partial).
+**Files:** `src/Daystrom.ClaudeAgentSdk/ClaudeAgentOptionsBuilder.cs` (partial).
 
 ### Checkpoint: Phase 7
 - [ ] `samples/Hooks` stub registers `PreToolUse` + `PostToolUse` and prints
@@ -627,7 +627,7 @@ registered `CanUseToolDelegate`, serialize `Allow`/`Deny` (with optional
   (matches Python — re-check spec).
 **Verification:** `CanUseToolTests`.
 **Dependencies:** 6.2.
-**Files:** `src/Anthropic.ClaudeAgentSdk/Control/ControlProtocol.cs` (partial).
+**Files:** `src/Daystrom.ClaudeAgentSdk/Control/ControlProtocol.cs` (partial).
 
 ### Task 8.2: `ApplyPermissionUpdateAsync` outbound — XS
 **Description:** Wire the `IClaudeAgentClient` method through the
@@ -636,7 +636,7 @@ registered `CanUseToolDelegate`, serialize `Allow`/`Deny` (with optional
 - [ ] FakeTransport sees the correct request shape.
 **Verification:** `PermissionUpdateTests`.
 **Dependencies:** 6.4.
-**Files:** `src/Anthropic.ClaudeAgentSdk/ClaudeAgentClient.cs` (partial).
+**Files:** `src/Daystrom.ClaudeAgentSdk/ClaudeAgentClient.cs` (partial).
 
 ### Checkpoint: Phase 8
 - [ ] `samples/ToolPermissionCallback` stub denies `Bash` for a specific
@@ -657,7 +657,7 @@ implementation.
 - [ ] Flush mode honored.
 **Verification:** `InMemorySessionStoreTests`.
 **Dependencies:** 3.7.
-**Files:** `src/Anthropic.ClaudeAgentSdk/Sessions/{ISessionStore,InMemorySessionStore}.cs`.
+**Files:** `src/Daystrom.ClaudeAgentSdk/Sessions/{ISessionStore,InMemorySessionStore}.cs`.
 
 ### Task 9.2: `SessionsClient` — M
 **Description:** Static API: `ListSessionsAsync`, `GetSessionInfoAsync`,
@@ -670,7 +670,7 @@ implementation.
 - [ ] FakeTransport tests cover happy path + one error path per method.
 **Verification:** `SessionsClientTests`.
 **Dependencies:** 9.1, 6.2.
-**Files:** `src/Anthropic.ClaudeAgentSdk/Sessions/SessionsClient.cs`.
+**Files:** `src/Daystrom.ClaudeAgentSdk/Sessions/SessionsClient.cs`.
 
 ### Task 9.3: `SessionImporter` + `SessionSummaryFolder` + `project_key_for_directory` — S
 **Description:** The standalone helper functions from spec §19.
@@ -678,7 +678,7 @@ implementation.
 - [ ] Per-function unit tests against fixture data.
 **Verification:** `SessionHelperTests`.
 **Dependencies:** 9.1.
-**Files:** `src/Anthropic.ClaudeAgentSdk/Sessions/{SessionImporter,SessionSummaryFolder}.cs`.
+**Files:** `src/Daystrom.ClaudeAgentSdk/Sessions/{SessionImporter,SessionSummaryFolder}.cs`.
 
 ### Checkpoint: Phase 9
 - [ ] `samples/SessionResume` stub forks a session and resumes from it.
@@ -690,7 +690,7 @@ implementation.
 Goal: `samples/McpCalculator`-style usage — decorate a class with
 `[McpServerToolType]` and pass it via `SdkMcpServer.FromType<T>`.
 
-### Task 10.1: `Anthropic.ClaudeAgentSdk.Mcp` project skeleton — S
+### Task 10.1: `Daystrom.ClaudeAgentSdk.Mcp` project skeleton — S
 **Description:** New csproj depending on core +
 `ModelContextProtocol`. `IsAotCompatible=true` (attribute path uses MCP SDK's
 source generator).
@@ -698,7 +698,7 @@ source generator).
 - [ ] `dotnet pack` produces a valid `.nupkg`.
 **Verification:** Empty smoke test.
 **Dependencies:** 1.2.
-**Files:** `src/Anthropic.ClaudeAgentSdk.Mcp/Anthropic.ClaudeAgentSdk.Mcp.csproj`.
+**Files:** `src/Daystrom.ClaudeAgentSdk.Mcp/Daystrom.ClaudeAgentSdk.Mcp.csproj`.
 
 ### Task 10.2: `SdkMcpServer.FromType` — M
 **Description:** Static helper that takes a `[McpServerToolType]`-decorated
@@ -711,7 +711,7 @@ class, instantiates the MCP SDK's `IMcpServer`, wraps it in
 - [ ] `FromType` overload taking `Type` works the same.
 **Verification:** `SdkMcpServerFromTypeTests`.
 **Dependencies:** 10.1, 3.6.
-**Files:** `src/Anthropic.ClaudeAgentSdk.Mcp/SdkMcpServer.cs`.
+**Files:** `src/Daystrom.ClaudeAgentSdk.Mcp/SdkMcpServer.cs`.
 
 ### Task 10.3: `mcp_message` routing in `ControlProtocol` — M
 **Description:** When the CLI sends `control_request{mcp_message}` for a
@@ -724,7 +724,7 @@ serialize the result back. Honors cancellation per spec §13.
   crash.
 **Verification:** `McpMessageRoutingTests`.
 **Dependencies:** 10.2, 6.2.
-**Files:** `src/Anthropic.ClaudeAgentSdk/Control/ControlProtocol.cs` (partial).
+**Files:** `src/Daystrom.ClaudeAgentSdk/Control/ControlProtocol.cs` (partial).
 
 ### Checkpoint: Phase 10
 - [ ] `samples/McpCalculator` stub computes `2+2` via the in-process MCP path.
@@ -743,7 +743,7 @@ don't want attribute decoration.
   end-to-end.
 **Verification:** `SdkMcpServerBuilderTests`.
 **Dependencies:** 10.2.
-**Files:** `src/Anthropic.ClaudeAgentSdk.Mcp/SdkMcpServerBuilder.cs`.
+**Files:** `src/Daystrom.ClaudeAgentSdk.Mcp/SdkMcpServerBuilder.cs`.
 
 ### Task 11.2: Reflection-based `AddTool(Delegate)` overload — S
 **Description:** Convenience overload annotated `[RequiresUnreferencedCode]`
@@ -754,7 +754,7 @@ don't want attribute decoration.
 **Verification:** `SdkMcpServerBuilderReflectionTests` (xUnit conditional on
 non-AOT build).
 **Dependencies:** 11.1.
-**Files:** `src/Anthropic.ClaudeAgentSdk.Mcp/SdkMcpServerBuilder.cs` (partial).
+**Files:** `src/Daystrom.ClaudeAgentSdk.Mcp/SdkMcpServerBuilder.cs` (partial).
 
 ### Checkpoint: Phase 11
 - [ ] Fluent-API variant of the calculator sample works.
@@ -766,14 +766,14 @@ non-AOT build).
 Goal: `services.AddClaudeAgent(configure)` plus
 `AddClaudeAgentHook<T>()`.
 
-### Task 12.1: `Anthropic.ClaudeAgentSdk.DependencyInjection` skeleton — S
+### Task 12.1: `Daystrom.ClaudeAgentSdk.DependencyInjection` skeleton — S
 **Description:** Csproj depending on core + MEDI.Abstractions +
 MEO.ConfigurationExtensions.
 **Acceptance:**
 - [ ] `dotnet pack` produces a valid `.nupkg`.
 **Verification:** Empty smoke test.
 **Dependencies:** 1.2.
-**Files:** `src/Anthropic.ClaudeAgentSdk.DependencyInjection/*.csproj`.
+**Files:** `src/Daystrom.ClaudeAgentSdk.DependencyInjection/*.csproj`.
 
 ### Task 12.2: `AddClaudeAgent` overloads — M
 **Description:** Three overloads from spec §8: parameterless,
@@ -785,7 +785,7 @@ one-shot enumerables).
 - [ ] `IConfiguration` binding round-trips a settings JSON file.
 **Verification:** `AddClaudeAgentTests`.
 **Dependencies:** 12.1, 6.4.
-**Files:** `src/Anthropic.ClaudeAgentSdk.DependencyInjection/ClaudeAgentServiceCollectionExtensions.cs`.
+**Files:** `src/Daystrom.ClaudeAgentSdk.DependencyInjection/ClaudeAgentServiceCollectionExtensions.cs`.
 
 ### Task 12.3: `AddClaudeAgentHook<T>` — S
 **Description:** Convenience that registers a class-based `IHookHandler<T>`
@@ -795,7 +795,7 @@ and wires it into `Options.Hooks` for the named event/matcher.
   integration-shaped test.
 **Verification:** `AddClaudeAgentHookTests`.
 **Dependencies:** 12.2, 7.1.
-**Files:** `src/Anthropic.ClaudeAgentSdk.DependencyInjection/ClaudeAgentServiceCollectionExtensions.cs` (partial).
+**Files:** `src/Daystrom.ClaudeAgentSdk.DependencyInjection/ClaudeAgentServiceCollectionExtensions.cs` (partial).
 
 ### Checkpoint: Phase 12
 - [ ] `samples/DependencyInjection` stub composes a `Host` and runs a query.
@@ -804,7 +804,7 @@ and wires it into `Options.Hooks` for the named event/matcher.
 
 ## Phase 13: Testing package
 
-Goal: `Anthropic.ClaudeAgentSdk.Testing` ships first-class fakes for users.
+Goal: `Daystrom.ClaudeAgentSdk.Testing` ships first-class fakes for users.
 
 ### Task 13.1: `FakeTransport` — M
 **Description:** `ITransport` impl backed by scripted in-memory
@@ -816,7 +816,7 @@ on the wire, the SDK yields Z".
 - [ ] Capture: assert the SDK sent the expected wire bytes.
 **Verification:** `FakeTransportTests`.
 **Dependencies:** 4.7.
-**Files:** `src/Anthropic.ClaudeAgentSdk.Testing/FakeTransport.cs`.
+**Files:** `src/Daystrom.ClaudeAgentSdk.Testing/FakeTransport.cs`.
 
 ### Task 13.2: `RecordingTransport` — S
 **Description:** Decorator over `SubprocessCliTransport` that captures every
@@ -825,7 +825,7 @@ NDJSON line in/out for snapshot assertions.
 - [ ] Snapshot test of a one-shot query is byte-stable.
 **Verification:** `RecordingTransportTests`.
 **Dependencies:** 13.1.
-**Files:** `src/Anthropic.ClaudeAgentSdk.Testing/RecordingTransport.cs`.
+**Files:** `src/Daystrom.ClaudeAgentSdk.Testing/RecordingTransport.cs`.
 
 ### Task 13.3: `ClaudeAgentClientHarness` — S
 **Description:** High-level convenience wrapper that drives an
@@ -836,7 +836,7 @@ assertion helpers (`AssertSentInterrupt()`, `AssertReceivedAssistantText()`).
   use the harness with no loss of coverage.
 **Verification:** `ClaudeAgentClientHarnessTests`.
 **Dependencies:** 13.1, 6.4.
-**Files:** `src/Anthropic.ClaudeAgentSdk.Testing/ClaudeAgentClientHarness.cs`.
+**Files:** `src/Daystrom.ClaudeAgentSdk.Testing/ClaudeAgentClientHarness.cs`.
 
 ### Checkpoint: Phase 13
 - [ ] Testing package documented in README with a 10-line example.

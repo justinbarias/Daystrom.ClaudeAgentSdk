@@ -1,9 +1,9 @@
 using System;
 using System.Text.Json;
-using Anthropic.ClaudeAgentSdk.Json;
-using Anthropic.ClaudeAgentSdk.Messages;
-using Anthropic.ClaudeAgentSdk.Messages.Content;
-using Anthropic.ClaudeAgentSdk.Sessions;
+using Daystrom.ClaudeAgentSdk.Json;
+using Daystrom.ClaudeAgentSdk.Messages;
+using Daystrom.ClaudeAgentSdk.Messages.Content;
+using Daystrom.ClaudeAgentSdk.Sessions;
 
 namespace AotSmoke;
 

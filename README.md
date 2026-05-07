@@ -17,11 +17,11 @@ for the implementation plan.
 
 | Package | Purpose |
 |---|---|
-| `Anthropic.ClaudeAgentSdk` | Core client, options, messages, transport |
-| `Anthropic.ClaudeAgentSdk.Mcp` | In-process MCP server helpers |
-| `Anthropic.ClaudeAgentSdk.DependencyInjection` | `services.AddClaudeAgent()` |
-| `Anthropic.ClaudeAgentSdk.Testing` | `FakeTransport`, `RecordingTransport` |
-| `runtime.{rid}.Anthropic.ClaudeAgentSdk.Native` | Bundled `claude` binary, per RID |
+| `Daystrom.ClaudeAgentSdk` | Core client, options, messages, transport |
+| `Daystrom.ClaudeAgentSdk.Mcp` | In-process MCP server helpers |
+| `Daystrom.ClaudeAgentSdk.DependencyInjection` | `services.AddClaudeAgent()` |
+| `Daystrom.ClaudeAgentSdk.Testing` | `FakeTransport`, `RecordingTransport` |
+| `runtime.{rid}.Daystrom.ClaudeAgentSdk.Native` | Bundled `claude` binary, per RID |
 
 ## Contributing
 

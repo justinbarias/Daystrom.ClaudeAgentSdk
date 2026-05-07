@@ -22,6 +22,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Anthropic.ClaudeAgentSdk\Anthropic.ClaudeAgentSdk.csproj" />
+    <ProjectReference Include="..\..\src\Daystrom.ClaudeAgentSdk\Daystrom.ClaudeAgentSdk.csproj" />
   </ItemGroup>
 </Project>

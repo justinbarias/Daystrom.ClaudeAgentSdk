@@ -12,7 +12,7 @@ Why this pin and not HEAD: the upstream SDK has since moved to CLI 2.1.132
 (via 2.1.128 → 2.1.129 → 2.1.131). Wire shapes can change between CLI minor
 versions — pinning the Python SDK to the same CLI we ship guarantees the
 discriminator strings and field names transcribed in
-`tests/Anthropic.ClaudeAgentSdk.Tests/Fixtures/discriminators.md` actually
+`tests/Daystrom.ClaudeAgentSdk.Tests/Fixtures/discriminators.md` actually
 match what our bundled CLI emits.
 
 When `<ClaudeCliVersion>` is bumped:

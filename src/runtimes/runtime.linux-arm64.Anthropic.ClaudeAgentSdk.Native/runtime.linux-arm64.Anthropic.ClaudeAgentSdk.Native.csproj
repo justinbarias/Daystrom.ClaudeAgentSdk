@@ -1,6 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <NativeRid>linux-arm64</NativeRid>
-    <PackageId>runtime.linux-arm64.Anthropic.ClaudeAgentSdk.Native</PackageId>
-  </PropertyGroup>
-</Project>
