@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading;
@@ -362,7 +361,7 @@ public sealed class SubprocessCliTransport : ITransport
         {
             psi.Environment[key] = value;
         }
-        psi.Environment[SdkVersionEnvKey] = SdkVersion;
+        psi.Environment[SdkVersionEnvKey] = ClaudeAgent.SdkVersion;
 
         OtelContextInjector.Inject(psi.Environment!, _options.Env, _logger);
 
@@ -420,13 +419,6 @@ public sealed class SubprocessCliTransport : ITransport
                 or NotSupportedException
                 or IOException
                 or ObjectDisposedException;
-
-    private static string SdkVersion { get; } =
-        typeof(SubprocessCliTransport)
-            .Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-            ?.InformationalVersion
-        ?? typeof(SubprocessCliTransport).Assembly.GetName().Version?.ToString()
-        ?? "0.0.0";
 
     private enum TransportMode
     {

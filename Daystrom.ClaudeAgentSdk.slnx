@@ -9,6 +9,9 @@
   <Folder Name="/eng/">
     <Project Path="eng/aot-smoke/AotSmoke.csproj" />
   </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/QuickStart/QuickStart.csproj" />
+  </Folder>
   <Folder Name="/runtimes/">
     <Project Path="src/runtimes/runtime.linux-arm64.Daystrom.ClaudeAgentSdk.Native/runtime.linux-arm64.Daystrom.ClaudeAgentSdk.Native.csproj" />
     <Project Path="src/runtimes/runtime.linux-x64.Daystrom.ClaudeAgentSdk.Native/runtime.linux-x64.Daystrom.ClaudeAgentSdk.Native.csproj" />
