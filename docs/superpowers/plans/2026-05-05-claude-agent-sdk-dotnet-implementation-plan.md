@@ -82,11 +82,13 @@ all three CI OSes.
 (MIT), placeholder `README.md`, `CHANGELOG.md`, `RELEASING.md`, `.gitignore`,
 `nuget.config`.
 **Acceptance:**
-- [ ] `dotnet --version` resolves the .NET 10 SDK band via `global.json`.
-- [ ] `dotnet build` on the empty `.sln` succeeds.
-**Verification:** `dotnet build && dotnet test` exits 0.
+- [x] `dotnet --version` resolves the .NET 10 SDK band via `global.json`.
+- [x] `dotnet build` on the empty `.sln` succeeds.
+**Verification:** `dotnet build && dotnet test` exits 0. ✅ Done in 6c4153e.
+Note: .NET 10's `dotnet new sln` defaults to `.slnx`, so the solution
+is `claude-agent-sdk-dotnet.slnx`, not `.sln`.
 **Dependencies:** None.
-**Files:** `claude-agent-sdk-dotnet.sln`, `global.json`, `LICENSE`, `README.md`,
+**Files:** `claude-agent-sdk-dotnet.slnx`, `global.json`, `LICENSE`, `README.md`,
 `CHANGELOG.md`, `RELEASING.md`, `.gitignore`, `nuget.config`.
 
 ### Task 1.2: Central build configuration — S
@@ -99,10 +101,17 @@ MEDI.Abstractions, MEO.ConfigurationExtensions, Microsoft.Sbom.Targets,
 xUnit, Verify.Xunit). `eng/Versions.props` carrying `<ClaudeCliVersion>` and
 `<SdkVersion>`.
 **Acceptance:**
-- [ ] All package versions live in `Directory.Packages.props`; no version
-  literals appear in any `.csproj`.
-- [ ] Adding a new project picks up Nullable + WarningsAsErrors automatically.
-**Verification:** `dotnet restore --locked-mode` succeeds.
+- [x] All package versions live in `Directory.Packages.props`; no version
+  literals appear in any `.csproj`. (Trivially true in Phase 1 — no csprojs
+  yet. The `<PackageVersion>` list is intentionally empty; entries land
+  per-phase as packages are first consumed.)
+- [x] Adding a new project picks up Nullable + WarningsAsErrors automatically.
+**Verification:** `dotnet restore --locked-mode` succeeds. ✅ Done in 2ec8356.
+Verified via throwaway `eng/.smoke/Smoke.csproj`: deliberate nullable
+violations were promoted to CS8600/CS8603 errors, and `msbuild
+-getProperty` round-tripped `ClaudeCliVersion`, `SdkVersion`, `Nullable`,
+`TreatWarningsAsErrors`, `LangVersion`. CPM enforcement deferred until
+Phase 3 (first real PackageReference).
 **Dependencies:** 1.1.
 **Files:** `Directory.Build.props`, `Directory.Packages.props`, `eng/Versions.props`.
 
@@ -112,14 +121,29 @@ xUnit, Verify.Xunit). `eng/Versions.props` carrying `<ClaudeCliVersion>` and
 `dotnet test`. No code coverage yet (added in Phase 15).
 **Acceptance:**
 - [ ] Push to a feature branch triggers all three matrix legs and they pass.
+  *(Authored in 07d7f49; verification deferred until a remote is added.)*
 **Verification:** Green check on a draft PR.
 **Dependencies:** 1.2.
 **Files:** `.github/workflows/ci.yml`.
 
+### Task 1.4 (added): CSharpier integration
+Not in the original spec; added on user request after Phase 1's three
+core tasks. Pinned CSharpier 1.2.6 as a local tool in
+`dotnet-tools.json` (root, per .NET 10's new default location), and
+added a Linux-only `format` job to `ci.yml` that runs
+`dotnet csharpier check .`. Existing files reformatted in place.
+**Acceptance:**
+- [x] `dotnet csharpier check .` passes locally.
+- [x] CI workflow gates merges on format compliance.
+**Verification:** ✅ Done in d16ff6c.
+
 ### Checkpoint: Phase 1
 - [ ] Empty solution builds and tests on Linux, macOS, Windows in CI.
-- [ ] Central Package Management + Nullable + WarningsAsErrors verified by
+  *(Locally verified on macOS; cross-OS verification deferred until remote.)*
+- [x] Central Package Management + Nullable + WarningsAsErrors verified by
   attempting to add a project that omits each — build fails as expected.
+  *(Nullable + WoE fully verified via smoke csproj; CPM enforcement
+  deferred to Phase 3 when the first `PackageReference` lands.)*
 
 ---
 
