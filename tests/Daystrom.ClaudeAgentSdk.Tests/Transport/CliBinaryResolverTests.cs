@@ -60,6 +60,45 @@ public class CliBinaryResolverTests
     }
 
     [Fact]
+    public void Resolve_FallsBackToFlattenedBundledBinary()
+    {
+        // When the consumer csproj sets <RuntimeIdentifier> (or runs
+        // `dotnet publish -r <rid>`), NuGet flattens runtime assets into
+        // BaseDir alongside the managed assemblies — there's no
+        // runtimes/{rid}/native/ prefix. The resolver must still pick up
+        // the bundled binary in that case before falling back to PATH.
+        var fs = new InMemoryFileSystem(home: FakeHome);
+        var flattened = Path.Combine(AppContext.BaseDirectory, BinaryName);
+        fs.AddFile(flattened);
+        var resolver = NewResolver(fs);
+
+        var options = ClaudeAgentOptions.Create().Build();
+
+        Assert.Equal(flattened, resolver.Resolve(options));
+    }
+
+    [Fact]
+    public void Resolve_LayeredBundledBeatsFlattened()
+    {
+        // Both layouts shouldn't normally coexist, but if they do the
+        // layered path wins because that's the canonical NuGet drop site.
+        var fs = new InMemoryFileSystem(home: FakeHome);
+        var layered = Path.Combine(
+            AppContext.BaseDirectory,
+            "runtimes",
+            RuntimeInformation.RuntimeIdentifier,
+            "native",
+            BinaryName
+        );
+        var flattened = Path.Combine(AppContext.BaseDirectory, BinaryName);
+        fs.AddFile(layered);
+        fs.AddFile(flattened);
+        var resolver = NewResolver(fs);
+
+        Assert.Equal(layered, resolver.Resolve(ClaudeAgentOptions.Create().Build()));
+    }
+
+    [Fact]
     public void Resolve_UsesPathWhenBundledMissing()
     {
         var fs = new InMemoryFileSystem(home: FakeHome);
@@ -164,6 +203,7 @@ public class CliBinaryResolverTests
         var message = ex.Message;
         Assert.Contains("Paths attempted", message);
         Assert.Contains(BinaryName, message);
+        Assert.Contains(Path.Combine(AppContext.BaseDirectory, BinaryName), message);
         Assert.Contains(Path.Combine(FakeHome, ".npm-global", "bin", "claude"), message);
         Assert.Contains(Path.Combine(FakeHome, ".claude", "local", "claude"), message);
         Assert.Contains("/path/dir-a", message);
@@ -343,6 +383,11 @@ public class CliBinaryResolverTests
             _env.TryGetValue(name, out var value) ? value : null;
 
         public string GetUserHome() => _home;
+
+        public string ReadAllText(string path) =>
+            throw new System.NotImplementedException(
+                "Resolver tests don't read files; use a separate fake if needed."
+            );
     }
 
     private sealed class RecordingLogger : ILogger

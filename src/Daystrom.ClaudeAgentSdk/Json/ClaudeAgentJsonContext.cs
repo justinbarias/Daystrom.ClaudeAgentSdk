@@ -4,6 +4,7 @@ using Daystrom.ClaudeAgentSdk.Agents.Plugins;
 using Daystrom.ClaudeAgentSdk.Hooks;
 using Daystrom.ClaudeAgentSdk.Hooks.Inputs;
 using Daystrom.ClaudeAgentSdk.Hooks.Outputs;
+using Daystrom.ClaudeAgentSdk.Internal;
 using Daystrom.ClaudeAgentSdk.Mcp;
 using Daystrom.ClaudeAgentSdk.Messages;
 using Daystrom.ClaudeAgentSdk.Messages.Content;
@@ -109,6 +110,7 @@ namespace Daystrom.ClaudeAgentSdk.Json;
 //
 // ── MCP (polymorphic on "type") ─────────────────────────────────────────
 [JsonSerializable(typeof(McpServerConfig))]
+[JsonSerializable(typeof(McpServersWrapper))]
 [JsonSerializable(typeof(McpServerStatusConfig))]
 [JsonSerializable(typeof(McpStatusResponse))]
 [JsonSerializable(typeof(McpServerInfo))]

@@ -13,6 +13,8 @@ namespace Daystrom.ClaudeAgentSdk.Transport;
 /// Resolves the path to the Claude Code CLI binary the SDK should spawn.
 /// Implements the spec §10 lookup order: <c>options.CliPath</c> → bundled
 /// native binary at <c>AppContext.BaseDirectory/runtimes/{rid}/native/</c>
+/// (layered NuGet layout) → <c>AppContext.BaseDirectory</c> (flattened
+/// layout used when the consumer csproj sets <c>RuntimeIdentifier</c>)
 /// → <c>PATH</c> → six npm/local fallback paths.
 /// </summary>
 /// <remarks>
@@ -100,19 +102,33 @@ public class CliBinaryResolver
             );
         }
 
-        // 2. Bundled native binary, dropped by the runtime.<rid> package.
-        var bundled = Path.Combine(
+        // 2a. Bundled native binary, layered layout — what NuGet stages
+        //     for portable consumers (no <RuntimeIdentifier> set on the
+        //     consumer csproj). Path: BaseDir/runtimes/{rid}/native/claude.
+        var bundledLayered = Path.Combine(
             AppContext.BaseDirectory,
             "runtimes",
             RuntimeInformation.RuntimeIdentifier,
             "native",
             binaryName
         );
-        attempted.Add(bundled);
-        if (_fs.FileExists(bundled))
+        attempted.Add(bundledLayered);
+        if (_fs.FileExists(bundledLayered))
         {
-            MaybeCheckVersion(bundled);
-            return bundled;
+            MaybeCheckVersion(bundledLayered);
+            return bundledLayered;
+        }
+
+        // 2b. Bundled native binary, flattened layout — what NuGet stages
+        //     when the consumer csproj sets <RuntimeIdentifier> or runs
+        //     `dotnet publish -r <rid>`. The runtime asset is collapsed
+        //     into BaseDir alongside the managed assemblies.
+        var bundledFlattened = Path.Combine(AppContext.BaseDirectory, binaryName);
+        attempted.Add(bundledFlattened);
+        if (_fs.FileExists(bundledFlattened))
+        {
+            MaybeCheckVersion(bundledFlattened);
+            return bundledFlattened;
         }
 
         // 3. PATH lookup. PATHEXT-style probing isn't applied because the

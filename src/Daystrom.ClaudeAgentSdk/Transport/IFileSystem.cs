@@ -16,4 +16,12 @@ public interface IFileSystem
 
     /// <summary>Returns the current user's home directory (used for the fallback paths).</summary>
     string GetUserHome();
+
+    /// <summary>Reads the entire contents of <paramref name="path"/> as UTF-8 text.</summary>
+    /// <remarks>
+    /// Used by <c>CommandBuilder</c> when merging a sandbox payload into a
+    /// settings file referenced by path. Implementations may throw the
+    /// usual <see cref="System.IO.IOException"/> family on failure.
+    /// </remarks>
+    string ReadAllText(string path);
 }

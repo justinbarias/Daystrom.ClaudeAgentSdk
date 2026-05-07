@@ -22,4 +22,7 @@ public sealed class DefaultFileSystem : IFileSystem
 
     /// <inheritdoc />
     public string GetUserHome() => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+    /// <inheritdoc />
+    public string ReadAllText(string path) => File.ReadAllText(path);
 }
