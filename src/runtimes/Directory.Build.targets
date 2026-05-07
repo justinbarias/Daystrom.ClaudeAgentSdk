@@ -1,0 +1,34 @@
+<Project>
+  <!--
+    Pre-pack guard: fail loudly if the native binary payload is missing.
+    Without this, an unprimed checkout would silently produce an empty
+    .nupkg containing only metadata.
+
+    Runs only as part of the pack pipeline (BeforeTargets="GenerateNuspec"),
+    so plain `dotnet build` against an unprimed checkout still succeeds.
+
+    Note on POSIX executable bit:
+      NuGet.Build.Tasks.Pack does not preserve Unix mode bits in zip
+      entries. Even when packing on a POSIX host with the source binary
+      marked +x, consumer machines extract the binary as 0644. Phase 4.1's
+      CliBinaryResolver is responsible for chmod +x on first use.
+  -->
+
+  <Target Name="EnsureNativePayloadPresent" BeforeTargets="GenerateNuspec">
+    <PropertyGroup>
+      <_NativeBinaryName Condition="'$(NativeRid)' == 'win-x64'">claude.exe</_NativeBinaryName>
+      <_NativeBinaryName Condition="'$(NativeRid)' != 'win-x64'">claude</_NativeBinaryName>
+      <_NativeBinaryPath>$(MSBuildProjectDirectory)\runtimes\$(NativeRid)\native\$(_NativeBinaryName)</_NativeBinaryPath>
+    </PropertyGroup>
+
+    <Error
+      Condition="'$(NativeRid)' == ''"
+      Text="The runtime native csproj must set &lt;NativeRid&gt; (e.g. linux-x64)."
+    />
+
+    <Error
+      Condition="!Exists('$(_NativeBinaryPath)')"
+      Text="Missing native payload at '$(_NativeBinaryPath)'. Run `pwsh ./eng/download-claude-cli.ps1` before packing this project."
+    />
+  </Target>
+</Project>

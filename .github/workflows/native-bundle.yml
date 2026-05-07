@@ -1,0 +1,59 @@
+name: native-bundle
+
+# Builds the five runtime.{rid}.Anthropic.ClaudeAgentSdk.Native NuGet
+# packages from the pinned <ClaudeCliVersion> in eng/Versions.props.
+#
+# Implements Phase 2 / Task 2.3 of the implementation plan.
+#
+# Runs on:
+#   * push of a v* tag (release path)
+#   * workflow_dispatch (manual smoke test on a feature branch)
+#
+# All five RIDs are produced from a single Linux runner. POSIX file modes
+# (the +x bit on `claude`) are preserved because we extract and pack on a
+# POSIX host - on Windows the bit cannot be persisted into the .nupkg.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_NOLOGO: 1
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+
+jobs:
+  bundle:
+    name: bundle native packages
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Show SDK version
+        run: dotnet --info
+
+      - name: Download pinned Claude Code CLI per RID
+        run: pwsh ./eng/download-claude-cli.ps1
+
+      - name: Pack five RID native packages
+        run: pwsh ./eng/pack-native.ps1
+
+      - name: Upload native packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-bundle-nupkgs
+          path: artifacts/*.nupkg
+          if-no-files-found: error
+          retention-days: 30

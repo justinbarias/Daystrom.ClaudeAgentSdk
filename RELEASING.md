@@ -48,13 +48,30 @@ To be set when each package first ships (Phase 15). Rough placeholders:
 | `Anthropic.ClaudeAgentSdk.Mcp` | 100 KB |
 | `Anthropic.ClaudeAgentSdk.DependencyInjection` | 50 KB |
 | `Anthropic.ClaudeAgentSdk.Testing` | 100 KB |
-| `runtime.{rid}.Anthropic.ClaudeAgentSdk.Native` | TBD per RID |
+| `runtime.linux-x64.Anthropic.ClaudeAgentSdk.Native` | 80 MB (observed 74 MB at CLI 2.1.126) |
+| `runtime.linux-arm64.Anthropic.ClaudeAgentSdk.Native` | 80 MB (observed 75 MB at CLI 2.1.126) |
+| `runtime.osx-x64.Anthropic.ClaudeAgentSdk.Native` | 70 MB (observed 63 MB at CLI 2.1.126) |
+| `runtime.osx-arm64.Anthropic.ClaudeAgentSdk.Native` | 70 MB (observed 62 MB at CLI 2.1.126) |
+| `runtime.win-x64.Anthropic.ClaudeAgentSdk.Native` | 80 MB (observed 76 MB at CLI 2.1.126) |
 
 CI fails if any package exceeds its budget by more than 10%.
 
 ## Native bundle
 
-See [`eng/download-claude-cli.ps1`](eng/download-claude-cli.ps1) and
+See [`eng/download-claude-cli.ps1`](eng/download-claude-cli.ps1),
+[`eng/cli-shasums.json`](eng/cli-shasums.json), and
 [`.github/workflows/native-bundle.yml`](.github/workflows/native-bundle.yml).
 The pinned CLI version is verified by SHA-256 against the upstream npm
 tarball before each release.
+
+Bumping `<ClaudeCliVersion>` requires updating
+[`eng/cli-shasums.json`](eng/cli-shasums.json) in the same PR with the
+SHA-256 of the new tarballs.
+
+### Executable bit on POSIX consumers
+
+`NuGet.Build.Tasks.Pack` does not preserve Unix mode bits in `.nupkg`
+zip entries, so the `claude` binary extracts as `0644` on consumer
+machines. `CliBinaryResolver` (Phase 4.1) is responsible for `chmod +x`
+on first use; release-time pack therefore does not need to run on a
+POSIX host.
