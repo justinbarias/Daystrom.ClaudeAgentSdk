@@ -48,11 +48,11 @@ To be set when each package first ships (Phase 15). Rough placeholders:
 | `Daystrom.ClaudeAgentSdk.Mcp` | 100 KB |
 | `Daystrom.ClaudeAgentSdk.DependencyInjection` | 50 KB |
 | `Daystrom.ClaudeAgentSdk.Testing` | 100 KB |
-| `runtime.linux-x64.Daystrom.ClaudeAgentSdk.Native` | 80 MB (observed 74 MB at CLI 2.1.126) |
-| `runtime.linux-arm64.Daystrom.ClaudeAgentSdk.Native` | 80 MB (observed 75 MB at CLI 2.1.126) |
-| `runtime.osx-x64.Daystrom.ClaudeAgentSdk.Native` | 70 MB (observed 63 MB at CLI 2.1.126) |
-| `runtime.osx-arm64.Daystrom.ClaudeAgentSdk.Native` | 70 MB (observed 62 MB at CLI 2.1.126) |
-| `runtime.win-x64.Daystrom.ClaudeAgentSdk.Native` | 80 MB (observed 76 MB at CLI 2.1.126) |
+| `Daystrom.ClaudeAgentSdk.Native.linux-x64` | 80 MB (observed 74 MB at CLI 2.1.126) |
+| `Daystrom.ClaudeAgentSdk.Native.linux-arm64` | 80 MB (observed 75 MB at CLI 2.1.126) |
+| `Daystrom.ClaudeAgentSdk.Native.osx-x64` | 70 MB (observed 63 MB at CLI 2.1.126) |
+| `Daystrom.ClaudeAgentSdk.Native.osx-arm64` | 70 MB (observed 62 MB at CLI 2.1.126) |
+| `Daystrom.ClaudeAgentSdk.Native.win-x64` | 80 MB (observed 76 MB at CLI 2.1.126) |
 
 CI fails if any package exceeds its budget by more than 10%.
 

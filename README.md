@@ -21,7 +21,7 @@ for the implementation plan.
 | `Daystrom.ClaudeAgentSdk.Mcp` | In-process MCP server helpers |
 | `Daystrom.ClaudeAgentSdk.DependencyInjection` | `services.AddClaudeAgent()` |
 | `Daystrom.ClaudeAgentSdk.Testing` | `FakeTransport`, `RecordingTransport` |
-| `runtime.{rid}.Daystrom.ClaudeAgentSdk.Native` | Bundled `claude` binary, per RID |
+| `Daystrom.ClaudeAgentSdk.Native.{rid}` | Bundled `claude` binary, per RID |
 
 ## Contributing
 

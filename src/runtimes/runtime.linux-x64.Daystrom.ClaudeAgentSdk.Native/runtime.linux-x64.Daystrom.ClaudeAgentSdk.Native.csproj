@@ -1,6 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <NativeRid>linux-x64</NativeRid>
-    <PackageId>runtime.linux-x64.Daystrom.ClaudeAgentSdk.Native</PackageId>
+    <!--
+      The runtime.<rid>.* prefix is reserved on nuget.org by Microsoft
+      (verified-prefix policy), so third-party packages get a misleading
+      409 Conflict at push time even when the version doesn't exist yet.
+      Convention for third-party RID-specific natives is <Owner>.<Component>.Native.<Rid>.
+    -->
+    <PackageId>Daystrom.ClaudeAgentSdk.Native.linux-x64</PackageId>
   </PropertyGroup>
 </Project>
