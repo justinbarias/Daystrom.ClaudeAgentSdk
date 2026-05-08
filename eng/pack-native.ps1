@@ -19,13 +19,20 @@
 
 .PARAMETER Rid
   Optional list of RIDs to pack. Defaults to all five.
+
+.PARAMETER Version
+  Optional NuGet package version. When set, passed to dotnet pack as
+  /p:Version=<value> so release.yml can stamp the GitHub release tag onto
+  every package without editing eng/Versions.props. When unset, packages
+  carry the value of <Version> from eng/Versions.props.
 #>
 
 [CmdletBinding()]
 param(
     [string]$Configuration = 'Release',
     [string]$OutputDir,
-    [string[]]$Rid
+    [string[]]$Rid,
+    [string]$Version
 )
 
 Set-StrictMode -Version 3.0
@@ -54,11 +61,18 @@ foreach ($r in $Rid) {
         throw "Project not found: $csprojPath"
     }
 
-    Write-Host "::group::pack runtime.$r.Daystrom.ClaudeAgentSdk.Native"
-    & dotnet pack $csprojPath `
-        --configuration $Configuration `
-        --output $OutputDir `
+    $packArgs = @(
+        $csprojPath,
+        '--configuration', $Configuration,
+        '--output', $OutputDir,
         '/p:ContinuousIntegrationBuild=true'
+    )
+    if ($Version) {
+        $packArgs += "/p:Version=$Version"
+    }
+
+    Write-Host "::group::pack runtime.$r.Daystrom.ClaudeAgentSdk.Native"
+    & dotnet pack @packArgs
     if ($LASTEXITCODE -ne 0) {
         Write-Host '::endgroup::'
         throw "dotnet pack failed for $r (exit $LASTEXITCODE)"

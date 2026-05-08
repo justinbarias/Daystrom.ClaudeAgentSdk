@@ -1,0 +1,137 @@
+name: release
+
+# Builds and publishes every shippable package in the repo, stamping each
+# one with the version derived from the GitHub release tag (or the manual
+# workflow_dispatch input). The version is injected into dotnet pack via
+# /p:Version=<release> so eng/Versions.props is never edited at release
+# time.
+#
+# Trigger paths:
+#   * release.published       → packs and pushes to nuget.org
+#   * workflow_dispatch       → packs always; pushes only when push=true
+#                               (manual smoke test of the release path)
+#
+# Required repo secret:
+#   NUGET_API_KEY             → API key with push rights for the
+#                               Daystrom.ClaudeAgentSdk + runtime.*.Native
+#                               package IDs on nuget.org.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (without leading v), e.g. 0.2.0'
+        required: true
+        type: string
+      push:
+        description: 'Push to nuget.org (false = pack only, smoke test)'
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_NOLOGO: 1
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+
+jobs:
+  release:
+    name: pack and push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Resolve release version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "release" ]; then
+            tag="${{ github.event.release.tag_name }}"
+            version="${tag#v}"
+          else
+            version="${{ inputs.version }}"
+          fi
+          if [ -z "$version" ]; then
+            echo "::error::Could not resolve release version"
+            exit 1
+          fi
+          # Reject anything that starts with 'v' or contains whitespace.
+          if [[ "$version" =~ ^v ]] || [[ "$version" =~ [[:space:]] ]]; then
+            echo "::error::Invalid version '$version' (strip leading 'v', no whitespace)"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Resolved release version: $version"
+
+      - name: Restore tools
+        run: dotnet tool restore
+
+      - name: Check formatting
+        run: dotnet csharpier check .
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Test
+        run: dotnet test --no-build --configuration Release --logger "console;verbosity=normal"
+
+      - name: Download pinned Claude Code CLI per RID
+        run: pwsh ./eng/download-claude-cli.ps1
+
+      - name: Pack five RID native packages
+        run: pwsh ./eng/pack-native.ps1 -Version ${{ steps.version.outputs.version }}
+
+      - name: Pack core SDK package
+        run: |
+          dotnet pack src/Daystrom.ClaudeAgentSdk/Daystrom.ClaudeAgentSdk.csproj \
+            --configuration Release \
+            --output artifacts \
+            -p:Version=${{ steps.version.outputs.version }} \
+            -p:ContinuousIntegrationBuild=true
+
+      - name: List artifacts
+        run: ls -la artifacts/
+
+      - name: Upload packages artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-nupkgs-${{ steps.version.outputs.version }}
+          path: |
+            artifacts/*.nupkg
+            artifacts/*.snupkg
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Push to nuget.org
+        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.push == true)
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${NUGET_API_KEY:-}" ]; then
+            echo "::error::NUGET_API_KEY secret is not set"
+            exit 1
+          fi
+          # `dotnet nuget push` auto-uploads matching .snupkg symbol packages
+          # alongside their .nupkg, so a single glob covers both surfaces.
+          dotnet nuget push "artifacts/*.nupkg" \
+            --api-key "$NUGET_API_KEY" \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
