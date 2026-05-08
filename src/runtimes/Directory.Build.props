@@ -42,6 +42,7 @@
     <RepositoryUrl>https://github.com/jbarias/claude-agent-sdk-dotnet</RepositoryUrl>
     <PackageTags>anthropic;claude;agent;sdk;native;cli</PackageTags>
     <PackageDescription>Native `claude` CLI binary for $(NativeRid). Internal runtime payload for Daystrom.ClaudeAgentSdk; not consumed directly.</PackageDescription>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -54,5 +55,6 @@
       Pack="true"
       PackagePath="runtimes/$(NativeRid)/native"
     />
+    <None Include="$(MSBuildThisFileDirectory)..\..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 </Project>

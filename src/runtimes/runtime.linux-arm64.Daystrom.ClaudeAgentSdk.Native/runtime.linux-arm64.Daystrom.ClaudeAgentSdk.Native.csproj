@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <NativeRid>linux-arm64</NativeRid>
-    <PackageId>runtime.linux-arm64.Daystrom.ClaudeAgentSdk.Native</PackageId>
+    <PackageId>Daystrom.ClaudeAgentSdk.Native.linux-arm64</PackageId>
   </PropertyGroup>
 </Project>

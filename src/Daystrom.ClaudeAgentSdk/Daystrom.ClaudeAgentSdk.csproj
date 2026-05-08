@@ -16,10 +16,15 @@
     <PackageTags>anthropic;claude;agent;sdk;ai;llm</PackageTags>
     <PackageProjectUrl>https://github.com/jbarias/claude-agent-sdk-dotnet</PackageProjectUrl>
     <RepositoryUrl>https://github.com/jbarias/claude-agent-sdk-dotnet</RepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <!-- Generate XML doc file for IntelliSense; spec §18 acceptance criterion. -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <!--
     Phase 4 brings the first runtime dependency: Microsoft.Extensions.Logging.Abstractions
