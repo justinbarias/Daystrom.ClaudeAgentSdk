@@ -1,0 +1,7 @@
+{
+  "type": "control_request",
+  "request_id": "req_4_2bf099a1",
+  "request": {
+    "subtype": "mcp_status"
+  }
+}

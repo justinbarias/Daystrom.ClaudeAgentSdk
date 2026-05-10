@@ -11,6 +11,7 @@
   </Folder>
   <Folder Name="/samples/">
     <Project Path="samples/QuickStart/QuickStart.csproj" />
+    <Project Path="samples/StreamingMode/StreamingMode.csproj" />
   </Folder>
   <Folder Name="/runtimes/">
     <Project Path="src/runtimes/runtime.linux-arm64.Daystrom.ClaudeAgentSdk.Native/runtime.linux-arm64.Daystrom.ClaudeAgentSdk.Native.csproj" />

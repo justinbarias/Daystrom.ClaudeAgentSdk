@@ -1,0 +1,11 @@
+{
+  "type": "control_request",
+  "request_id": "req_1_a8c0bc91",
+  "request": {
+    "subtype": "initialize",
+    "hooks": null,
+    "agents": null,
+    "excludeDynamicSections": true,
+    "skills": ["python", "bash"]
+  }
+}

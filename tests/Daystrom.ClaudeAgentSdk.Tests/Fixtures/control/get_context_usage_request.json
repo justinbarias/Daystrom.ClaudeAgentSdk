@@ -1,0 +1,7 @@
+{
+  "type": "control_request",
+  "request_id": "req_5_b81d3344",
+  "request": {
+    "subtype": "get_context_usage"
+  }
+}

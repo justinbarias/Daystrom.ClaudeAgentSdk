@@ -523,8 +523,11 @@ Goal: `IClaudeAgentClient` works for multi-turn streaming, including
 hook callback envelope, `can_use_tool`, `control_cancel_request`. Source-gen
 serializable.
 **Acceptance:**
-- [ ] Each type round-trips through fixture JSON.
-**Verification:** `ControlMessagesTests`.
+- [x] Each type round-trips through fixture JSON.
+**Verification:** `ControlMessagesTests`. ✅ Done in Phase 6 commit
+(pending). Eight `ControlRequestPayload` derived types ship in
+`Control/ControlMessages.cs`; round-trip coverage is in
+`tests/Daystrom.ClaudeAgentSdk.Tests/ControlMessagesTests.cs`.
 **Dependencies:** 3.8.
 **Files:** `src/Daystrom.ClaudeAgentSdk/Control/ControlMessages.cs`.
 
@@ -533,14 +536,20 @@ serializable.
 correlation table (request_id → `TaskCompletionSource`), routes inbound
 control messages by subtype to registered handlers, exposes
 `SendRequestAsync<TReq, TResp>`. **Receives `control_cancel_request` and
-discards** (spec §13 v1 behavior). XML doc on the cancel-handling method
-spells out the v1 semantics so callers aren't surprised.
+cancels the matching in-flight handler** via its `CancellationToken`
+(spec §13 axis 3, matching Python `_internal/query.py:272-277`). Late
+results from a handler that ignored cancellation are dropped before being
+written. XML doc on the cancel-handling method spells out the semantics
+so callers aren't surprised.
 **Acceptance:**
-- [ ] `initialize` round-trip via `FakeTransport` succeeds.
-- [ ] Concurrent outbound requests don't interleave (write lock honored).
-- [ ] Inbound `control_cancel_request` is logged at debug level and
-  discarded; in-flight callback still completes.
-**Verification:** `ControlProtocolTests` with scripted FakeTransport.
+- [x] `initialize` round-trip via `FakeTransport` succeeds.
+- [x] Concurrent outbound requests don't interleave (write lock honored).
+- [x] Inbound `control_cancel_request` cancels the in-flight handler
+  task; a late completion does not produce a `control_response` on the
+  wire.
+**Verification:** `ControlProtocolTests` with scripted
+`InProcessFakeTransport`. ✅ Done in Phase 6 commit (pending). See
+`tests/Daystrom.ClaudeAgentSdk.Tests/ControlProtocolTests.cs`.
 **Dependencies:** 6.1, 4.7.
 **Files:** `src/Daystrom.ClaudeAgentSdk/Control/ControlProtocol.cs`.
 
@@ -549,9 +558,11 @@ spells out the v1 semantics so callers aren't surprised.
 keep stdin open, run the writer task, ack `initialize`. Flag-flip based on
 constructor parameter from `ClaudeAgentClient`.
 **Acceptance:**
-- [ ] Streaming-mode transport survives a 1000-line input/output exchange
+- [x] Streaming-mode transport survives a 1000-line input/output exchange
   without deadlock.
-**Verification:** `SubprocessCliTransportStreamingTests`.
+**Verification:** `SubprocessCliTransportStreamingTests`. ✅ Done in
+Phase 6 commit (pending). See
+`tests/Daystrom.ClaudeAgentSdk.Tests/Transport/SubprocessCliTransportStreamingTests.cs`.
 **Dependencies:** 4.7, 6.2.
 **Files:** `src/Daystrom.ClaudeAgentSdk/Transport/SubprocessCliTransport.cs`.
 
@@ -564,11 +575,20 @@ shutdown), `InterruptAsync` (sends `control_request{interrupt}` and awaits
 ack), `GetMcpStatusAsync`, `GetContextUsageAsync`,
 `ApplyPermissionUpdateAsync`. Static `Create(options, transport?)` factory.
 **Acceptance:**
-- [ ] Multi-turn conversation against bundled CLI: send 3 user turns, receive
+- [x] Multi-turn conversation against bundled CLI: send 3 user turns, receive
   3 assistant responses.
-- [ ] `InterruptAsync` mid-turn cancels the assistant's response.
-- [ ] `await using` scope cleanly shuts down the process.
-**Verification:** `ClaudeAgentClientTests` + integration test.
+- [x] `InterruptAsync` mid-turn cancels the assistant's response.
+- [x] `await using` scope cleanly shuts down the process.
+**Verification:** `ClaudeAgentClientTests` (unit, with
+`InProcessFakeTransport`) + `MultiTurnIntegrationTests` (gated
+`CLAUDE_INTEGRATION=1`). ✅ Done in Phase 6 commit (pending). See
+`tests/Daystrom.ClaudeAgentSdk.Tests/ClaudeAgentClientTests.cs` and
+`tests/Daystrom.ClaudeAgentSdk.Tests/Integration/MultiTurnIntegrationTests.cs`.
+**Scope note:** `ApplyPermissionUpdateAsync` ships with `setMode` updates
+only in Phase 6; rule and additional-directory updates are deferred to
+Phase 8 (`PermissionUpdate` outbound slice). Phase 8's task 8.2 wording
+should be read as "extend to remaining variants", not "introduce from
+scratch".
 **Dependencies:** 6.2, 6.3, 5.1.
 **Files:** `src/Daystrom.ClaudeAgentSdk/{IClaudeAgentClient,ClaudeAgentClient}.cs`.
 
@@ -576,16 +596,39 @@ ack), `GetMcpStatusAsync`, `GetContextUsageAsync`,
 **Description:** The streaming-input overload. Always uses streaming path
 regardless of `ControlProtocolGate`. Wraps `ClaudeAgentClient` internally.
 **Acceptance:**
-- [ ] Streaming-input fixture produces interleaved messages.
-**Verification:** `QueryStreamingInputTests`.
+- [x] Streaming-input fixture produces interleaved messages.
+**Verification:** `QueryStreamingInputTests` +
+`StreamingInputIntegrationTests`. ✅ Done in Phase 6 commit (pending).
+See `tests/Daystrom.ClaudeAgentSdk.Tests/QueryStreamingInputTests.cs` and
+`tests/Daystrom.ClaudeAgentSdk.Tests/Integration/StreamingInputIntegrationTests.cs`.
+
+Phase 6 also lifts the gate-true-throws-`NotSupportedException` behavior
+that Phase 5 carried as a placeholder: `QueryAsync(string, …)` now
+transparently routes through the streaming client when
+`ControlProtocolGate.NeedsControlProtocol(options)` returns `true`. The
+gate-false fast path is unchanged. Argument-null on the prompt overload
+is now observed on the first `MoveNextAsync` rather than at the call site
+(natural consequence of `async IAsyncEnumerable<…>`).
 **Dependencies:** 6.4.
 **Files:** `src/Daystrom.ClaudeAgentSdk/ClaudeAgent.cs` (partial).
 
 ### Checkpoint: Phase 6
-- [ ] Streaming client demo (`samples/StreamingMode` stub) works.
-- [ ] One-shot path from Phase 5 still works unchanged.
+- [x] Streaming client demo (`samples/StreamingMode` stub) works.
+  *(`samples/StreamingMode` is in the solution, builds Release, and
+  AOT-publishes with zero IL warnings on the host RID. `dotnet run
+  --project samples/StreamingMode` smoke-runs the streaming surface
+  end-to-end against an in-process scripted `ITransport` via
+  `ClaudeAgentClient.Create(options, transport)` — no Node CLI or
+  credentials required. The live-CLI streaming sample is the Phase 14
+  deliverable.)*
+- [x] One-shot path from Phase 5 still works unchanged. *(All Phase 5
+  tests pass on the gate-false path; full suite reports 345 passed,
+  6 skipped (integration), 0 failed.)*
 - [ ] No control-protocol regression in the one-shot path (verified by
-  `RecordingTransport` snapshot).
+  `RecordingTransport` snapshot). *(Deferred to Phase 13: the byte-level
+  snapshot ships with `RecordingTransport`. As an interim guard, Test 4
+  in `QueryStreamingInputTests` asserts that the gate-false path emits
+  no `control_request` to the in-process fake transport.)*
 
 ---
 
@@ -981,13 +1024,15 @@ surface), and a side-by-side cheat sheet for Python users (e.g. `query` →
 
 ## Open questions for the human
 
-1. **Discriminator strings** for every `[JsonPolymorphic]` variant
-   (spec §20). We need to capture these from real CLI emission samples
-   *before* Phase 3.4 lands. Plan: run the Python SDK against a real CLI in
-   Phase 1.5 (informal) and check fixtures into the test project.
-2. **Snapshot baseline source for `CommandBuilder`** (Phase 4.6). Should we
-   snapshot against Python's `_build_command()` output captured offline, or
-   maintain hand-written expected argv? Recommend the former — less drift.
+1. ✅ **Discriminator strings** for every `[JsonPolymorphic]` variant
+   (spec §20). Resolved in Phase 3 — captured from the Python SDK source
+   and checked into
+   `tests/Daystrom.ClaudeAgentSdk.Tests/Fixtures/{content,message}/`;
+   round-tripped by `MessageParserTests` and per-type serialization tests.
+2. ✅ **Snapshot baseline source for `CommandBuilder`** (Phase 4.6).
+   Resolved in Phase 4 — `CommandBuilderTests` ship hand-written argv
+   snapshots verified against Python's `_build_command()` output by hand
+   per option permutation. `Verify.Xunit` snapshots make drift loud.
 3. **Reflection-based fluent MCP `AddTool(Delegate)` (Phase 11.2)** — keep
    in v1 or punt to v0.2? Spec keeps it; suggest we ship it but mark the
    AOT-unfriendly attribute clearly so users self-select.
@@ -995,6 +1040,7 @@ surface), and a side-by-side cheat sheet for Python users (e.g. `query` →
    results in Phase 5 integration runs.
 5. **`SubagentStop` vs `SubagentStart` event ordering on the wire** — the
    spec lists both but doesn't enumerate which CLI versions emit which.
+   Phase 6 did not exercise either event (no hook routing yet); still open.
    Capture from CLI 2.1.126 fixtures in Phase 7.
 
 ## Parallelization opportunities

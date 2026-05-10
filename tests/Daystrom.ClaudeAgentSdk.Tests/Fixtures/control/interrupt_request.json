@@ -1,0 +1,7 @@
+{
+  "type": "control_request",
+  "request_id": "req_2_4f3a1b2c",
+  "request": {
+    "subtype": "interrupt"
+  }
+}

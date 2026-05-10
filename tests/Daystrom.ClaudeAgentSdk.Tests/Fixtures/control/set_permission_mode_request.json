@@ -1,0 +1,8 @@
+{
+  "type": "control_request",
+  "request_id": "req_3_77ab12de",
+  "request": {
+    "subtype": "set_permission_mode",
+    "mode": "plan"
+  }
+}

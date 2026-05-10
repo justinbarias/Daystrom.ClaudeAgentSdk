@@ -232,6 +232,49 @@ Values: `authentication_failed`, `billing_error`, `rate_limit`,
 
 ---
 
+## Control protocol
+
+Source: `_internal/query.py` — outbound construction at lines 165–215
+(initialize), 674–693 (mcp_status, get_context_usage, interrupt,
+set_permission_mode); inbound dispatch at 339–423 (can_use_tool,
+hook_callback, mcp_message); response envelope at 425–450; cancel
+routing at 272–278. Outer envelope `type` field is read by hand by the
+dispatcher (not `[JsonPolymorphic]`); `request.subtype` is the inner
+discriminator on `ControlRequestPayload`.
+
+| .NET record | Wire `subtype` | Python source | Direction |
+|---|---|---|---|
+| `InitializeRequest` | `initialize` | `query.py:196` | outbound |
+| `InterruptRequest` | `interrupt` | `query.py:684` | outbound |
+| `SetPermissionModeRequest` | `set_permission_mode` | `query.py:690` | outbound |
+| `McpStatusRequest` | `mcp_status` | `query.py:676` | outbound |
+| `GetContextUsageRequest` | `get_context_usage` | `query.py:680` | outbound |
+| `CanUseToolRequest` | `can_use_tool` | `query.py:344` | inbound — handler ships in Phase 8 |
+| `HookCallbackRequest` | `hook_callback` | `query.py:389` | inbound — handler ships in Phase 7 |
+| `McpMessageRequest` | `mcp_message` | `query.py:405` | inbound — handler ships in Phase 10 |
+
+Outer envelope wire `type` strings (read by the dispatcher, not
+modeled via `[JsonPolymorphic]` because the three envelopes have
+divergent shapes):
+
+| .NET record | Wire `type` | Python source |
+|---|---|---|
+| `ControlRequestEnvelope` | `control_request` | `query.py:264, 473–477` |
+| `ControlResponseEnvelope` | `control_response` | `query.py:250, 427` |
+| `ControlCancelRequestEnvelope` | `control_cancel_request` | `query.py:272` |
+
+⚠ **`InitializeRequest.ExcludeDynamicSections` is camelCase
+`excludeDynamicSections` on the wire**, not snake-case — confirmed at
+`query.py:202–203` and `_internal/client.py:165`. Other initialize
+fields (`hooks`, `agents`, `skills`) are snake-case.
+
+`ControlResponsePayload` is intentionally NOT `[JsonPolymorphic]`: the
+Python SDK uses a single shape with both a `subtype` ("success" |
+"error") and a `request_id` field, with `response` (success body) or
+`error` (error string) populated alternately. See `query.py:425–450`.
+
+---
+
 ## Field-level naming exceptions
 
 The wire format is *predominantly* snake_case_lower, but several types use
