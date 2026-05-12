@@ -320,6 +320,35 @@ public sealed class ClaudeAgentClient : IClaudeAgentClient
 }
 ```
 
+### Streaming-mode user input
+
+```csharp
+public sealed record UserMessageInput
+{
+    public required string Text { get; init; }
+    public string SessionId { get; init; } = "";
+    public string? ParentToolUseId { get; init; }
+}
+```
+
+Wire envelope (NDJSON line written to the CLI's stdin in streaming mode):
+
+```json
+{
+  "type": "user",
+  "session_id": "<SessionId>",
+  "message": { "role": "user", "content": "<Text>" },
+  "parent_tool_use_id": null
+}
+```
+
+`parent_tool_use_id` is omitted from the line as `null` when
+`ParentToolUseId` is `null`. v1 ships only the string-content shape on the
+`message.content` field (mirrors the Python SDK's first-turn fast path).
+A future phase may extend `Text` into a discriminated union of content
+blocks if a real call site needs it; the wire field will continue to
+accept either a bare string or an array of blocks per the CLI contract.
+
 ### Options & fluent builder
 
 ```csharp
@@ -560,8 +589,10 @@ has to trust.
   `interrupt` (sent by `IClaudeAgentClient.InterruptAsync`),
   `set_permission_mode`, `mcp_message`, hook callbacks, `can_use_tool`.
 - Inbound `control_cancel_request` (CLI → SDK, "abandon any pending
-  callback for `request_id` X") is **received but not acted upon** in v1,
-  matching Python and other reference SDKs. See §13 for the semantics.
+  callback for `request_id` X") cancels the in-flight handler task by
+  `request_id`; if the handler completes anyway, its response is dropped
+  rather than written. Matches Python `_internal/query.py:272-277`. See
+  §13 for the full semantics and implications for callback authors.
 - Stdin send protected by an async lock (matching Python's `_write_lock`).
 - Stdout: speculative buffer-and-parse with configurable max buffer
   (default 1 MiB).
@@ -645,15 +676,18 @@ Three distinct concepts; treat them as separate axes:
 3. **Inbound `control_cancel_request`** (CLI → SDK). The CLI sends this when
    it no longer needs the result of a `control_request` it issued earlier
    (typically a hook callback or `can_use_tool` prompt whose answer is
-   moot — e.g., the user aborted before the callback returned). In v1 the
-   SDK reads the message, discards it, and lets any in-flight callback run
-   to completion; the late result is ignored on its way back. This matches
-   the Python SDK and 0xeb's reference implementation, both of which carry
-   the same TODO. **Implication for callback authors:** do not assume that a
-   hook callback being invoked means its result will be consumed. Hooks
-   should be idempotent and side-effect-light, or guard their side effects
-   with their own cancellation logic. Wiring this up properly is on the
-   roadmap but not a v1 commitment.
+   moot — e.g., the user aborted before the callback returned). The SDK
+   reads the message, looks up the in-flight handler task by `request_id`,
+   and cancels it via the handler's `CancellationToken`. Late results from
+   a handler that completes before noticing cancellation are dropped on the
+   way back — no `control_response` is written for a cancelled
+   `request_id`. This matches the Python SDK's behavior in
+   `_internal/query.py:272-277`. **Implication for callback authors:** hook
+   callbacks should still be idempotent and side-effect-light. Cancellation
+   propagates through the `CancellationToken` passed to every hook /
+   `can_use_tool` handler, but a handler that ignores the token may run to
+   completion before its reply is dropped — so user-side side effects are
+   not automatically rolled back.
 
 ## 14. Testing
 

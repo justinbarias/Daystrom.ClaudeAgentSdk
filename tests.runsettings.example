@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  VSTest run-settings consumed by `dotnet test`, the C# Dev Kit Test
+  Explorer in VS Code, Visual Studio, and Rider. The `EnvironmentVariables`
+  block is what makes [IntegrationFact] tests actually run instead of
+  silently skipping.
+
+  Copy this file to `tests.runsettings` (gitignored), fill in the OAuth
+  token placeholder, and the workspace setting `dotnet.unitTests.runSettingsPath`
+  in `.vscode/settings.json` will pick it up automatically.
+-->
+<RunSettings>
+  <RunConfiguration>
+    <EnvironmentVariables>
+      <CLAUDE_INTEGRATION>1</CLAUDE_INTEGRATION>
+      <CLAUDE_CODE_OAUTH_TOKEN>&lt;YOUR_CLAUDE_CODE_OAUTH_TOKEN&gt;</CLAUDE_CODE_OAUTH_TOKEN>
+      <!-- Or, instead of the OAuth token: -->
+      <!-- <ANTHROPIC_API_KEY>&lt;YOUR_ANTHROPIC_API_KEY&gt;</ANTHROPIC_API_KEY> -->
+    </EnvironmentVariables>
+  </RunConfiguration>
+</RunSettings>

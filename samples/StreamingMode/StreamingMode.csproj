@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>StreamingMode</AssemblyName>
+    <RootNamespace>StreamingMode</RootNamespace>
+
+    <!-- Sample exercises the public streaming-client surface only. Keeps
+         AOT-clean so the Phase 6 checkpoint can verify that the streaming
+         path publishes cleanly under PublishAot=true alongside QuickStart. -->
+    <IsAotCompatible>true</IsAotCompatible>
+
+    <IsPackable>false</IsPackable>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+
+    <InvariantGlobalization>true</InvariantGlobalization>
+
+    <!-- Samples are runnable demos, not libraries. Doc-comment warnings
+         are noise here. -->
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Daystrom.ClaudeAgentSdk\Daystrom.ClaudeAgentSdk.csproj" />
+  </ItemGroup>
+</Project>

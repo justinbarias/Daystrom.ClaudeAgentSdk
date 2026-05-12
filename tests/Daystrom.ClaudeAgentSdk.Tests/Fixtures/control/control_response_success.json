@@ -1,0 +1,12 @@
+{
+  "type": "control_response",
+  "response": {
+    "subtype": "success",
+    "request_id": "req_4_2bf099a1",
+    "response": {
+      "mcpServers": [
+        { "name": "my-tools", "status": "connected" }
+      ]
+    }
+  }
+}

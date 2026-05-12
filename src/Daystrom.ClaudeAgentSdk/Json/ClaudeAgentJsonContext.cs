@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using Daystrom.ClaudeAgentSdk.Agents;
 using Daystrom.ClaudeAgentSdk.Agents.Plugins;
+using Daystrom.ClaudeAgentSdk.Control;
 using Daystrom.ClaudeAgentSdk.Hooks;
 using Daystrom.ClaudeAgentSdk.Hooks.Inputs;
 using Daystrom.ClaudeAgentSdk.Hooks.Outputs;
@@ -137,4 +138,11 @@ namespace Daystrom.ClaudeAgentSdk.Json;
 [JsonSerializable(typeof(SessionMessage))]
 [JsonSerializable(typeof(SDKSessionInfo))]
 [JsonSerializable(typeof(ForkSessionResult))]
+//
+// ── Control protocol ────────────────────────────────────────────────────
+[JsonSerializable(typeof(ControlRequestEnvelope))]
+[JsonSerializable(typeof(ControlResponseEnvelope))]
+[JsonSerializable(typeof(ControlCancelRequestEnvelope))]
+[JsonSerializable(typeof(ControlRequestPayload))]
+[JsonSerializable(typeof(ControlResponsePayload))]
 internal sealed partial class ClaudeAgentJsonContext : JsonSerializerContext;

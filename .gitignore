@@ -56,3 +56,6 @@ src/runtimes/runtime.*.Daystrom.ClaudeAgentSdk.Native/runtimes/**/native/claude.
 *.local
 .env
 .env.local
+# Real .runsettings carries integration credentials; only the .example
+# template (without secrets) is committed.
+tests.runsettings

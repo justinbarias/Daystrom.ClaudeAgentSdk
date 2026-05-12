@@ -1,0 +1,17 @@
+{
+  "type": "control_request",
+  "request_id": "cli_req_42_d3aa97ef",
+  "request": {
+    "subtype": "can_use_tool",
+    "tool_name": "Bash",
+    "input": {
+      "command": "ls -la /tmp",
+      "description": "List temp dir"
+    },
+    "permission_suggestions": [
+      { "type": "allow", "rule": "Bash(ls:*)" }
+    ],
+    "tool_use_id": "toolu_01ABCDEF",
+    "agent_id": null
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "type": "control_request",
+  "request_id": "cli_req_43_aa11bb22",
+  "request": {
+    "subtype": "hook_callback",
+    "callback_id": "hook_3",
+    "input": {
+      "hook_event_name": "PreToolUse",
+      "tool_name": "Bash",
+      "tool_input": { "command": "rm -rf /" }
+    },
+    "tool_use_id": "toolu_01ABCDEF"
+  }
+}

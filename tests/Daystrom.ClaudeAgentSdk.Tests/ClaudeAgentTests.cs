@@ -135,49 +135,19 @@ public class ClaudeAgentTests
     }
 
     [Fact]
-    public void QueryAsync_ThrowsArgumentNull_ForNullPrompt()
+    public async Task QueryAsync_ThrowsArgumentNull_ForNullPrompt()
     {
-        Assert.Throws<ArgumentNullException>(() => ClaudeAgent.QueryAsync(null!));
-    }
-
-    [Fact]
-    public void QueryAsync_ThrowsNotSupported_WhenCanUseToolSet()
-    {
-        var options = new ClaudeAgentOptions
+        // The string overload is now an async iterator, so the
+        // ArgumentNullException is observed on first iteration rather than
+        // synchronously at the call site — which matches every other
+        // async-enumerable on the public surface.
+        await Assert.ThrowsAsync<ArgumentNullException>(async () =>
         {
-            CanUseTool = (n, i, c, t) =>
-                ValueTask.FromResult<PermissionResult>(new PermissionResultAllow()),
-        };
-        var ex = Assert.Throws<NotSupportedException>(() =>
-            ClaudeAgent.QueryAsync("ping", options)
-        );
-        Assert.Contains("Phase 6", ex.Message);
-    }
-
-    [Fact]
-    public void QueryAsync_ThrowsNotSupported_WhenHooksRegistered()
-    {
-        var options = new ClaudeAgentOptions
-        {
-            Hooks = new Dictionary<HookEvent, IReadOnlyList<HookMatcher>>
+            await foreach (var _ in ClaudeAgent.QueryAsync((string)null!))
             {
-                [HookEvent.PreToolUse] = new[] { new HookMatcher() },
-            },
-        };
-        Assert.Throws<NotSupportedException>(() => ClaudeAgent.QueryAsync("ping", options));
-    }
-
-    [Fact]
-    public void QueryAsync_ThrowsNotSupported_WhenSdkMcpServerPresent()
-    {
-        var options = new ClaudeAgentOptions
-        {
-            McpServers = new Dictionary<string, McpServerConfig>
-            {
-                ["calc"] = new McpSdkServerConfig { Name = "calc", Instance = null! },
-            },
-        };
-        Assert.Throws<NotSupportedException>(() => ClaudeAgent.QueryAsync("ping", options));
+                // Drain — should never reach a yield.
+            }
+        });
     }
 
     private static async Task<List<Message>> CollectAsync(IAsyncEnumerable<Message> source)
