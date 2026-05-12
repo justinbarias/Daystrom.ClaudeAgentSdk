@@ -317,4 +317,12 @@ public class QueryStreamingInputTests
         // assertion the brief asks for.)
         Assert.Empty(transport.WrittenLines);
     }
+
+    [Fact]
+    public void QueryAsync_StreamingInput_NullPrompts_Throws()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            ClaudeAgent.QueryAsync((IAsyncEnumerable<UserMessageInput>)null!)
+        );
+    }
 }

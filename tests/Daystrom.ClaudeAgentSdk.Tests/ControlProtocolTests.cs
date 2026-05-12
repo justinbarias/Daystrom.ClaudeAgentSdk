@@ -320,6 +320,217 @@ public class ControlProtocolTests
         Assert.Fail("No SDK messages surfaced.");
     }
 
+    [Fact]
+    public async Task RegisterInboundHandler_DuplicateForSameType_Throws()
+    {
+        await using var transport = new InProcessFakeTransport();
+        await transport.ConnectAsync();
+        await using var protocol = new ControlProtocol(transport);
+
+        using var reg = protocol.RegisterInboundHandler<CanUseToolRequest>(
+            (_, _) => Task.FromResult(Parse("{}"))
+        );
+
+        Assert.Throws<InvalidOperationException>(() =>
+            protocol.RegisterInboundHandler<CanUseToolRequest>(
+                (_, _) => Task.FromResult(Parse("{}"))
+            )
+        );
+    }
+
+    [Fact]
+    public async Task RegisterInboundHandler_DisposingRegistration_AllowsReRegistration()
+    {
+        await using var transport = new InProcessFakeTransport();
+        await transport.ConnectAsync();
+        await using var protocol = new ControlProtocol(transport);
+
+        var first = protocol.RegisterInboundHandler<CanUseToolRequest>(
+            (_, _) => Task.FromResult(Parse("{}"))
+        );
+        first.Dispose();
+
+        using var second = protocol.RegisterInboundHandler<CanUseToolRequest>(
+            (_, _) => Task.FromResult(Parse("{}"))
+        );
+        Assert.NotNull(second);
+    }
+
+    [Fact]
+    public async Task ControlResponse_ForUnknownRequestId_IsIgnored()
+    {
+        await using var transport = new InProcessFakeTransport();
+        await transport.ConnectAsync();
+        await using var protocol = new ControlProtocol(transport);
+
+        var iterator = StartConsumingSdkMessages(protocol, out var cts);
+
+        transport.EnqueueControlResponse("orphan_id", "success", Parse("{}"));
+
+        await Task.Delay(100);
+
+        cts.Cancel();
+        try
+        {
+            await iterator;
+        }
+        catch (OperationCanceledException) { }
+    }
+
+    [Fact]
+    public async Task ControlResponse_MalformedFrame_IsIgnoredByReadLoop()
+    {
+        await using var transport = new InProcessFakeTransport();
+        await transport.ConnectAsync();
+        await using var protocol = new ControlProtocol(transport);
+
+        var iterator = StartConsumingSdkMessages(protocol, out var cts);
+
+        transport.EnqueueRaw("""{"type":"control_response"}""");
+        await Task.Delay(100);
+
+        cts.Cancel();
+        try
+        {
+            await iterator;
+        }
+        catch (OperationCanceledException) { }
+    }
+
+    [Fact]
+    public async Task ControlRequest_MalformedFrame_IsIgnoredByReadLoop()
+    {
+        await using var transport = new InProcessFakeTransport();
+        await transport.ConnectAsync();
+        await using var protocol = new ControlProtocol(transport);
+
+        var iterator = StartConsumingSdkMessages(protocol, out var cts);
+
+        transport.EnqueueRaw("""{"type":"control_request","request_id":"r1"}""");
+        await Task.Delay(100);
+
+        cts.Cancel();
+        try
+        {
+            await iterator;
+        }
+        catch (OperationCanceledException) { }
+
+        Assert.Empty(transport.WrittenLines);
+    }
+
+    [Fact]
+    public async Task ControlRequest_DuplicateInFlightRequestId_IsDropped()
+    {
+        await using var transport = new InProcessFakeTransport();
+        await transport.ConnectAsync();
+        await using var protocol = new ControlProtocol(transport);
+
+        var gate = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        using var registration = protocol.RegisterInboundHandler<CanUseToolRequest>(
+            async (req, ct) =>
+            {
+                gate.TrySetResult();
+                await release.Task.WaitAsync(ct);
+                return Parse("{}");
+            }
+        );
+
+        var iterator = StartConsumingSdkMessages(protocol, out var cts);
+
+        var extras = Parse("""{"tool_name":"Bash","input":{"command":"ls"}}""");
+        transport.EnqueueControlRequest("dup_req", "can_use_tool", extras);
+        await gate.Task.WaitAsync(TimeSpan.FromSeconds(2));
+
+        transport.EnqueueControlRequest("dup_req", "can_use_tool", extras);
+        await Task.Delay(100);
+
+        release.TrySetResult();
+        await PollForWrittenAsync(transport, 1);
+
+        Assert.Single(transport.WrittenLines);
+
+        cts.Cancel();
+        try
+        {
+            await iterator;
+        }
+        catch (OperationCanceledException) { }
+    }
+
+    [Fact]
+    public async Task ControlCancel_MalformedFrame_IsIgnoredByReadLoop()
+    {
+        await using var transport = new InProcessFakeTransport();
+        await transport.ConnectAsync();
+        await using var protocol = new ControlProtocol(transport);
+
+        var iterator = StartConsumingSdkMessages(protocol, out var cts);
+
+        transport.EnqueueRaw("""{"type":"control_cancel_request"}""");
+        await Task.Delay(100);
+
+        cts.Cancel();
+        try
+        {
+            await iterator;
+        }
+        catch (OperationCanceledException) { }
+
+        Assert.Empty(transport.WrittenLines);
+    }
+
+    [Fact]
+    public async Task ControlCancel_ForUnknownRequestId_IsIgnored()
+    {
+        await using var transport = new InProcessFakeTransport();
+        await transport.ConnectAsync();
+        await using var protocol = new ControlProtocol(transport);
+
+        var iterator = StartConsumingSdkMessages(protocol, out var cts);
+
+        transport.EnqueueControlCancel("no_such_request");
+        await Task.Delay(100);
+
+        cts.Cancel();
+        try
+        {
+            await iterator;
+        }
+        catch (OperationCanceledException) { }
+    }
+
+    [Fact]
+    public async Task SendRequest_AfterDispose_Throws()
+    {
+        var transport = new InProcessFakeTransport();
+        await transport.ConnectAsync();
+        var protocol = new ControlProtocol(transport);
+        await protocol.DisposeAsync();
+
+        await Assert.ThrowsAsync<ObjectDisposedException>(async () =>
+        {
+            await protocol.SendRequestAsync<InterruptRequest>(new InterruptRequest());
+        });
+
+        await transport.DisposeAsync();
+    }
+
+    [Fact]
+    public async Task WriteRaw_AfterDispose_Throws()
+    {
+        var transport = new InProcessFakeTransport();
+        await transport.ConnectAsync();
+        var protocol = new ControlProtocol(transport);
+        await protocol.DisposeAsync();
+
+        await Assert.ThrowsAsync<ObjectDisposedException>(() => protocol.WriteRawAsync("noop"));
+
+        await transport.DisposeAsync();
+    }
+
     // ── Helpers ─────────────────────────────────────────────────────────
 
     private static async Task<string> PollForRequestIdAsync(InProcessFakeTransport transport)

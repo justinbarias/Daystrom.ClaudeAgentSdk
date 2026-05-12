@@ -383,4 +383,55 @@ public class ClaudeAgentClientTests
 
         await transport.DisposeAsync();
     }
+
+    [Fact]
+    public async Task SendUserMessageAsync_BeforeConnect_Throws()
+    {
+        await using var transport = new InProcessFakeTransport();
+        await using var client = ClaudeAgentClient.Create(new ClaudeAgentOptions(), transport);
+
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            client.SendUserMessageAsync("nope")
+        );
+        Assert.Contains("not connected", ex.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task ReceiveMessagesAsync_BeforeConnect_Throws()
+    {
+        await using var transport = new InProcessFakeTransport();
+        await using var client = ClaudeAgentClient.Create(new ClaudeAgentOptions(), transport);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await foreach (var _ in client.ReceiveMessagesAsync())
+            {
+                break;
+            }
+        });
+    }
+
+    [Fact]
+    public async Task ConnectAsync_WithSystemPromptPreset_PassesExcludeDynamicSections()
+    {
+        await using var transport = new InProcessFakeTransport();
+        var options = new ClaudeAgentOptions
+        {
+            SystemPrompt = new SystemPrompt.SystemPromptPreset(
+                Append: null,
+                ExcludeDynamicSections: true
+            ),
+        };
+        await using var client = ClaudeAgentClient.Create(options, transport);
+
+        var connectTask = client.ConnectAsync();
+        var requestId = await PollForRequestIdAsync(transport);
+        transport.EnqueueControlResponse(requestId, "success", Parse("{}"));
+        await connectTask.WaitAsync(TimeSpan.FromSeconds(2));
+
+        var node = JsonNode.Parse(transport.WrittenLines[0])!.AsObject();
+        var request = node["request"]!.AsObject();
+        Assert.Equal("initialize", request["subtype"]!.GetValue<string>());
+        Assert.True(request["excludeDynamicSections"]!.GetValue<bool>());
+    }
 }
